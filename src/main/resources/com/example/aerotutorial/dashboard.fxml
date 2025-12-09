@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.web.WebView?>
+<VBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.aerotutorial.DashboardController">
+    <Label text="AeroSafe Dashboard" style="-fx-font-size: 24px;"/>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Label text="Select Location on Map:"/>
+    </HBox>
+
+    <WebView fx:id="mapView" prefWidth="600" prefHeight="400"/>
+
+    <Label fx:id="currentAqiLabel" text="Current AQI: -" style="-fx-font-size: 18px;"/>
+    <Label fx:id="predictedAqiLabel" text="Predicted AQI: -" style="-fx-font-size: 16px;"/>
+    <Label fx:id="aqiAlertLabel" text="" style="-fx-font-size: 16px; -fx-text-fill: red;"/>
+
+    <LineChart fx:id="historyChart" title="AQI History" prefHeight="300" prefWidth="500">
+        <xAxis>
+            <CategoryAxis label="Day"/>
+        </xAxis>
+        <yAxis>
+            <NumberAxis label="AQI"/>
+        </yAxis>
+    </LineChart>
+
+    <Button text="Logout" onAction="#logout"/>
+</VBox>

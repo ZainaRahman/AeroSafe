@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.aerotutorial.SignupController">
+    <Label text="AeroSafe Signup" style="-fx-font-size: 24px;"/>
+    <TextField fx:id="usernameField" promptText="Username"/>
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+    <TextField fx:id="locationField" promptText="Location"/>
+    <Button text="Register" onAction="#handleSignup"/>
+    <Button text="Back to Login" onAction="#switchToLogin"/>
+    <Label fx:id="messageLabel" style="-fx-text-fill: red;"/>
+</VBox>
