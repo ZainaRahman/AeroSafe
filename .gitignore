@@ -37,3 +37,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### API Keys and Secrets ###
+# Never commit API keys or sensitive configuration
+src/main/resources/config.properties
+config.properties
+*.properties
+!config.properties.template
+aerosafe.db
+

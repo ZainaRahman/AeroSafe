@@ -1,0 +1,10 @@
+# OpenWeatherMap API Configuration Template
+#
+# Instructions:
+# 1. Copy this file and rename it to 'config.properties'
+# 2. Get your free API key at: https://openweathermap.org/api
+# 3. Replace 'YOUR_API_KEY_HERE' with your actual API key
+# 4. Never commit the actual config.properties file to Git!
+
+openweather.api.key=YOUR_API_KEY_HERE
+
