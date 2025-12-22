@@ -43,8 +43,10 @@ public class LoginController {
                 messageLabel.setText("Login successful!");
                 Stage stage = (Stage) usernameField.getScene().getWindow();
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
-                Scene dashboardScene = new Scene(loader.load(), 600, 500);
+                Scene dashboardScene = new Scene(loader.load(), 1200, 600);
                 stage.setScene(dashboardScene);
+                stage.centerOnScreen();
+
 
             } else {
                 System.out.println("Login failed for: " + usernameField.getText());
