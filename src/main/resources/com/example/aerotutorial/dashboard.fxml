@@ -10,27 +10,117 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.web.WebView?>
-<VBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.aerotutorial.DashboardController">
-    <Label text="AeroSafe Dashboard" style="-fx-font-size: 24px;"/>
+<?import javafx.geometry.Insets?>
 
-    <HBox spacing="10" alignment="CENTER">
-        <Label text="Select Location on Map:"/>
-    </HBox>
+<!-- Main BorderPane Layout -->
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.aerotutorial.DashboardController"
+            style="-fx-background-color: #f5f5f5;" prefWidth="1200" prefHeight="800">
 
-    <WebView fx:id="mapView" prefWidth="600" prefHeight="400"/>
+    <!-- Left Sidebar with Buttons -->
+    <left>
+        <VBox spacing="15" alignment="TOP_CENTER" style="-fx-background-color: #2c3e50; -fx-padding: 20;" prefWidth="220">
+            <Label text="🌍 AeroSafe" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Separator style="-fx-background-color: rgba(255,255,255,0.2);"/>
 
-    <Label fx:id="currentAqiLabel" text="Current AQI: -" style="-fx-font-size: 18px;"/>
-    <Label fx:id="predictedAqiLabel" text="Predicted AQI: -" style="-fx-font-size: 16px;"/>
-    <Label fx:id="aqiAlertLabel" text="" style="-fx-font-size: 16px; -fx-text-fill: red;"/>
+            <VBox spacing="10" VBox.vgrow="ALWAYS">
+                <Label text="ACTIONS" style="-fx-font-size: 11px; -fx-text-fill: #95a5a6; -fx-font-weight: bold; -fx-padding: 10 0 5 0;"/>
 
-    <LineChart fx:id="historyChart" title="AQI History" prefHeight="300" prefWidth="500">
-        <xAxis>
-            <CategoryAxis label="Day"/>
-        </xAxis>
-        <yAxis>
-            <NumberAxis label="AQI"/>
-        </yAxis>
-    </LineChart>
+                <Button text="🔄 Refresh AQI" onAction="#refreshCurrentLocation"
+                        maxWidth="Infinity"
+                        style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
 
-    <Button text="Logout" onAction="#logout"/>
-</VBox>
+                <Button text="📊 Add Test Data" onAction="#addTestData"
+                        maxWidth="Infinity"
+                        style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <Separator style="-fx-background-color: rgba(255,255,255,0.2);"/>
+
+                <Button text="🚪 Logout" onAction="#logout"
+                        maxWidth="Infinity"
+                        style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Center Content Area with ScrollPane -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <VBox spacing="20" style="-fx-padding: 20;">
+
+                <!-- Header -->
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Air Quality Index Dashboard" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <Label text="📍 Select a location on the map to view real-time AQI data and predictions"
+                           style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                </VBox>
+
+                <!-- Selected Location Display -->
+                <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #3498db; -fx-padding: 15 20; -fx-background-radius: 8;">
+                    <Label text="📍 Selected Location:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Label fx:id="locationLabel" text="No location selected" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
+                </HBox>
+
+                <!-- Map Section -->
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                    <Label text="🗺️ Interactive Map" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <WebView fx:id="mapView" prefWidth="850" prefHeight="400"/>
+                </VBox>
+
+                <!-- AQI Display Panel -->
+                <HBox spacing="20" alignment="CENTER">
+                    <VBox alignment="CENTER" spacing="8" HBox.hgrow="ALWAYS"
+                          style="-fx-padding: 25; -fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                        <Label text="CURRENT AQI" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6; -fx-font-weight: bold;"/>
+                        <Label fx:id="currentAqiLabel" text="Current AQI: -" style="-fx-font-size: 26px; -fx-font-weight: bold;"/>
+                        <Label fx:id="aqiAlertLabel" text="" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="8" HBox.hgrow="ALWAYS"
+                          style="-fx-padding: 25; -fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                        <Label text="PREDICTED AQI" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6; -fx-font-weight: bold;"/>
+                        <Label fx:id="predictedAqiLabel" text="Predicted AQI: -" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+                        <Label text="(Tomorrow)" style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Chart Section -->
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                    <Label text="📊 7-Day AQI History &amp; Trend Analysis" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <LineChart fx:id="historyChart" prefHeight="350" prefWidth="850" legendVisible="false"
+                               style="-fx-background-color: transparent;">
+                        <xAxis>
+                            <CategoryAxis label="Day" style="-fx-font-size: 12px;"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="AQI Value" lowerBound="0" upperBound="350" style="-fx-font-size: 12px;"/>
+                        </yAxis>
+                    </LineChart>
+                    <Label text="💡 Hover over data points to see detailed AQI information"
+                           style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d; -fx-font-style: italic;"/>
+                </VBox>
+
+                <!-- Info Section -->
+                <VBox spacing="10" style="-fx-background-color: #e8f4f8; -fx-padding: 15; -fx-background-radius: 8;">
+                    <Label text="ℹ️ AQI Color Guide:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <VBox spacing="8">
+                        <HBox spacing="20">
+                            <Label text="● 0-50 Good" style="-fx-text-fill: #00E400; -fx-font-size: 12px; -fx-font-weight: bold; -fx-min-width: 150;"/>
+                            <Label text="● 51-100 Moderate" style="-fx-text-fill: #FFAA00; -fx-font-size: 12px; -fx-font-weight: bold; -fx-min-width: 150;"/>
+                            <Label text="● 101-150 Unhealthy (Sensitive)" style="-fx-text-fill: #FF7E00; -fx-font-size: 12px; -fx-font-weight: bold; -fx-min-width: 220;"/>
+                        </HBox>
+                        <HBox spacing="20">
+                            <Label text="● 151-200 Unhealthy" style="-fx-text-fill: #FF0000; -fx-font-size: 12px; -fx-font-weight: bold; -fx-min-width: 150;"/>
+                            <Label text="● 201-300 Very Unhealthy" style="-fx-text-fill: #8F3F97; -fx-font-size: 12px; -fx-font-weight: bold; -fx-min-width: 180;"/>
+                            <Label text="● 301+ Hazardous" style="-fx-text-fill: #7E0023; -fx-font-size: 12px; -fx-font-weight: bold; -fx-min-width: 150;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
+
