@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -15,7 +16,7 @@
 
 <!-- Main BorderPane Layout -->
 
-<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="800" prefWidth="1200" style="-fx-background-color: #f5f5f5;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="com.example.aerotutorial.DashboardController">
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.aerotutorial.DashboardController">
 
     <!-- Left Sidebar with Buttons -->
     <left>
@@ -23,26 +24,41 @@
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="🌍 AeroSafe" />
             <Separator style="-fx-background-color: rgba(255,255,255,0.2);" />
 
-            <VBox spacing="10" VBox.vgrow="ALWAYS">
+            <VBox spacing="10">
+                <Label style="-fx-font-size: 11px; -fx-text-fill: #95a5a6; -fx-font-weight: bold; -fx-padding: 10 0 5 0;" text="SEARCH LOCATION" />
+
+                <TextField fx:id="searchField" promptText="Search location..." style="-fx-font-size: 12px; -fx-padding: 8;"/>
+                <Button maxWidth="Infinity" onAction="#searchLocation" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #16a085; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;" text="🔍 Search" />
+
+                <Label style="-fx-font-size: 11px; -fx-text-fill: #95a5a6; -fx-font-weight: bold; -fx-padding: 10 0 5 0;" text="RECENT SEARCHES" />
+                <ScrollPane prefHeight="100" style="-fx-background-color: transparent; -fx-background: transparent;">
+                    <VBox fx:id="searchHistoryBox" spacing="5" style="-fx-padding: 5;"/>
+                </ScrollPane>
+
+                <Separator style="-fx-background-color: rgba(255,255,255,0.2);" />
+
                 <Label style="-fx-font-size: 11px; -fx-text-fill: #95a5a6; -fx-font-weight: bold; -fx-padding: 10 0 5 0;" text="ACTIONS" />
 
                 <Button maxWidth="Infinity" onAction="#refreshCurrentLocation" style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;" text="🔄 Refresh AQI" />
 
                 <Button maxWidth="Infinity" onAction="#addTestData" style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;" text="📊 Add Test Data" />
 
-                <Region VBox.vgrow="ALWAYS" />
-
-                <Separator style="-fx-background-color: rgba(255,255,255,0.2);" />
-
-                <Button maxWidth="Infinity" onAction="#logout" style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;" text="🚪 Logout" />
+                <Button maxWidth="Infinity" onAction="#reportIssue" style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;" text="⚠️ Report Issue" />
             </VBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <Separator style="-fx-background-color: rgba(255,255,255,0.2);" />
+
+            <Button maxWidth="Infinity" onAction="#logout" style="-fx-font-size: 14px; -fx-padding: 12 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;" text="🚪 Logout" />
         </VBox>
     </left>
 
     <!-- Center Content Area with ScrollPane -->
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
-            <VBox spacing="20" style="-fx-padding: 20;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="AS_NEEDED">
+            <VBox spacing="20" style="-fx-padding: 20; -fx-min-height: 100%;">
+
 
                 <!-- Header -->
                 <VBox alignment="CENTER" spacing="5">
