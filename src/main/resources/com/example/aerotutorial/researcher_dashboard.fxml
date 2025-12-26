@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.aerotutorial.ResearcherDashboardController" style="-fx-background-color: #ecf0f1;">
+
+    <top>
+        <VBox style="-fx-background-color: #34495e; -fx-padding: 15;">
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Label fx:id="welcomeLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="🔬 Researcher Dashboard" HBox.hgrow="ALWAYS"/>
+                <Button onAction="#logout" style="-fx-font-size: 13px; -fx-padding: 8 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5;" text="🚪 Logout" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="200" spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;" text="🗂️ Tools" />
+
+            <Button maxWidth="Infinity" onAction="#showDataView" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 5;" text="📊 Data Viewer" />
+            <Button maxWidth="Infinity" onAction="#showDataHub" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;" text="🗄️ Data Hub" />
+            <Button maxWidth="Infinity" onAction="#showResearchers" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #1abc9c; -fx-text-fill: white; -fx-background-radius: 5;" text="👥 Researchers" />
+            <Button maxWidth="Infinity" onAction="#showPublications" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #e67e22; -fx-text-fill: white; -fx-background-radius: 5;" text="📚 Publications" />
+            <Button maxWidth="Infinity" onAction="#exportData" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5;" text="📥 Export" />
+
+            <Separator style="-fx-background-color: rgba(255,255,255,0.2);" />
+
+            <TextField fx:id="locationSearchField" promptText="Search..." style="-fx-font-size: 11px; -fx-padding: 6;"/>
+            <Button maxWidth="Infinity" onAction="#searchLocation" style="-fx-font-size: 12px; -fx-padding: 8; -fx-background-color: #16a085; -fx-text-fill: white; -fx-background-radius: 5;" text="🔍 Search" />
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentPane">
+
+            <ScrollPane fx:id="dataViewPanel" fitToWidth="true" visible="true">
+                <VBox spacing="15" style="-fx-padding: 20;">
+
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8;">
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="🗺️ Map" />
+                        <Label fx:id="selectedLocationLabel" style="-fx-font-size: 13px;" text="Click to select location" />
+                        <WebView fx:id="mapView" prefHeight="400" />
+                    </VBox>
+
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8;">
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="🧪 Pollutants" />
+                        <GridPane hgap="15" vgap="15">
+                            <VBox spacing="5" style="-fx-background-color: #fff3cd; -fx-padding: 15;" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="PM2.5" />
+                                <Label fx:id="pm25Label" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="--" />
+                            </VBox>
+                            <VBox spacing="5" style="-fx-background-color: #d1ecf1; -fx-padding: 15;" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="PM10" />
+                                <Label fx:id="pm10Label" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="--" />
+                            </VBox>
+                            <VBox spacing="5" style="-fx-background-color: #f8d7da; -fx-padding: 15;" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="NO₂" />
+                                <Label fx:id="no2Label" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="--" />
+                            </VBox>
+                            <VBox spacing="5" style="-fx-background-color: #d4edda; -fx-padding: 15;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="O₃" />
+                                <Label fx:id="o3Label" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="--" />
+                            </VBox>
+                            <VBox spacing="5" style="-fx-background-color: #e2d5f3; -fx-padding: 15;" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="SO₂" />
+                                <Label fx:id="so2Label" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="--" />
+                            </VBox>
+                            <VBox spacing="5" style="-fx-background-color: #fff0e6; -fx-padding: 15;" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="CO" />
+                                <Label fx:id="coLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="--" />
+                            </VBox>
+                        </GridPane>
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button onAction="#addToDataHub" style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-color: #3498db; -fx-text-fill: white;" text="➕ Add to Hub" />
+                            <Button onAction="#refreshData" style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-color: #27ae60; -fx-text-fill: white;" text="🔄 Refresh" />
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+
+            <ScrollPane fx:id="dataHubPanel" fitToWidth="true" visible="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="🗄️ Data Hub" />
+                        <TableView fx:id="dataHubTable" prefHeight="400">
+                            <columns>
+                                <TableColumn fx:id="dateColumn" text="Date" prefWidth="120" />
+                                <TableColumn fx:id="locationColumn" text="Location" prefWidth="200" />
+                                <TableColumn fx:id="pm25Column" text="PM2.5" prefWidth="80" />
+                                <TableColumn fx:id="pm10Column" text="PM10" prefWidth="80" />
+                                <TableColumn fx:id="no2Column" text="NO₂" prefWidth="80" />
+                                <TableColumn fx:id="o3Column" text="O₃" prefWidth="80" />
+                                <TableColumn fx:id="so2Column" text="SO₂" prefWidth="80" />
+                                <TableColumn fx:id="coColumn" text="CO" prefWidth="80" />
+                            </columns>
+                        </TableView>
+                        <HBox spacing="10">
+                            <Button onAction="#calculateStatistics" style="-fx-font-size: 13px; -fx-padding: 10 15; -fx-background-color: #9b59b6; -fx-text-fill: white;" text="📊 Stats" />
+                            <Button onAction="#clearDataHub" style="-fx-font-size: 13px; -fx-padding: 10 15; -fx-background-color: #e74c3c; -fx-text-fill: white;" text="🗑️ Clear" />
+                        </HBox>
+                        <Label fx:id="statsLabel" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #ecf0f1;" wrapText="true"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+
+            <ScrollPane fx:id="researchersPanel" fitToWidth="true" visible="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="👥 Researchers" />
+                        <HBox spacing="10">
+                            <TextField fx:id="researcherSearchField" promptText="Search..." HBox.hgrow="ALWAYS" />
+                            <Button onAction="#searchResearcher" style="-fx-font-size: 13px; -fx-padding: 8 15; -fx-background-color: #1abc9c; -fx-text-fill: white;" text="🔍" />
+                        </HBox>
+                        <VBox fx:id="researchersListBox" spacing="10" />
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+
+            <ScrollPane fx:id="publicationsPanel" fitToWidth="true" visible="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="📚 Publications" />
+                        <HBox spacing="10">
+                            <TextField fx:id="publicationSearchField" promptText="Search..." HBox.hgrow="ALWAYS" />
+                            <Button onAction="#searchPublications" style="-fx-font-size: 13px; -fx-padding: 8 15; -fx-background-color: #e67e22; -fx-text-fill: white;" text="🔍" />
+                        </HBox>
+                        <VBox fx:id="publicationsListBox" spacing="10" />
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+
+        </StackPane>
+    </center>
+
+</BorderPane>
+
