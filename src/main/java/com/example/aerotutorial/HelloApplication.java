@@ -10,9 +10,11 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // Initialize database (creates any missing tables without dropping existing ones)
         DBSetup.initialize();
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
-        primaryStage.setScene(new Scene(loader.load(), 400, 300));
+        primaryStage.setScene(new Scene(loader.load(), 400, 400));
         primaryStage.setTitle("AeroSafe Desktop");
         primaryStage.show();
     }

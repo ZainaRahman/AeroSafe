@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>AeroSafe Map</title>
@@ -27,16 +27,56 @@
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Click event
+    // Wait for Java bridge to be ready
+    var javaAppReady = false;
+    var checkInterval = setInterval(function() {
+        if (window.app && typeof window.app.onMapClick === 'function') {
+            javaAppReady = true;
+            console.log("✓ Java bridge connected successfully!");
+            clearInterval(checkInterval);
+        }
+    }, 100);
+
+    // Stop checking after 10 seconds
+    setTimeout(function() {
+        clearInterval(checkInterval);
+        if (!javaAppReady) {
+            console.error("Java bridge failed to connect after 10 seconds");
+        }
+    }, 10000);
+
+    // Click event with retry mechanism
     map.on('click', function(e) {
         var lat = e.latlng.lat;
         var lon = e.latlng.lng;
-        var cityName = "Selected Location"; // Optional: get city name from a geocoder API
-        if (window.app && window.app.onMapClick) {
-            window.app.onMapClick(cityName, lat, lon);
-        } else {
-            alert("Java app method not found!");
+        var cityName = "Selected Location";
+
+        // Try to call Java method with retries
+        var maxRetries = 3;
+        var retryCount = 0;
+
+        function tryCallJava() {
+            if (window.app && typeof window.app.onMapClick === 'function') {
+                try {
+                    window.app.onMapClick(cityName, lat, lon);
+                    console.log("✓ Map clicked: " + lat + ", " + lon);
+                    return true;
+                } catch (err) {
+                    console.error("Error calling Java method: " + err);
+                    return false;
+                }
+            } else if (retryCount < maxRetries) {
+                retryCount++;
+                console.log("Retry " + retryCount + ": Java app not ready, waiting...");
+                setTimeout(tryCallJava, 200);
+                return false;
+            } else {
+                console.error("Java app method not found after " + maxRetries + " retries!");
+                return false;
+            }
         }
+
+        tryCallJava();
     });
 </script>
 </body>
