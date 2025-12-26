@@ -15,7 +15,7 @@ public class ConfigLoader {
     /**
      * Load configuration from config.properties file
      */
-    private static void loadConfig() {
+    static void loadConfig() {
         if (loaded) return;
 
         try (InputStream input = ConfigLoader.class.getClassLoader()

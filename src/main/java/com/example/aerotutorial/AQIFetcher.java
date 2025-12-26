@@ -262,6 +262,7 @@ public class AQIFetcher {
         if (pm25 <= 12.0) {
             return (int) linearScale(pm25, 0, 12.0, 0, 50);
         } else if (pm25 <= 35.4) {
+
             return (int) linearScale(pm25, 12.1, 35.4, 51, 100);
         } else if (pm25 <= 55.4) {
             return (int) linearScale(pm25, 35.5, 55.4, 101, 150);
