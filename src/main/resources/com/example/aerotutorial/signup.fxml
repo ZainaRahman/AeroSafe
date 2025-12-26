@@ -6,12 +6,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.aerotutorial.SignupController">
-    <Label text="AeroSafe Signup" style="-fx-font-size: 24px;"/>
-    <TextField fx:id="usernameField" promptText="Username"/>
-    <PasswordField fx:id="passwordField" promptText="Password"/>
-    <TextField fx:id="locationField" promptText="Location"/>
-    <Button text="Register" onAction="#handleSignup"/>
-    <Button text="Back to Login" onAction="#switchToLogin"/>
-    <Label fx:id="messageLabel" style="-fx-text-fill: red;"/>
+<VBox spacing="15" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.aerotutorial.SignupController" style="-fx-padding: 20;">
+    <Label text="🌍 AeroSafe Signup" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+    <VBox spacing="8" alignment="CENTER" style="-fx-padding: 10;">
+        <Label text="Select Your Role:" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+        <ComboBox fx:id="roleComboBox" promptText="Choose Role" prefWidth="250" style="-fx-font-size: 13px;"/>
+    </VBox>
+
+    <TextField fx:id="usernameField" promptText="Username" prefWidth="250" style="-fx-font-size: 13px; -fx-padding: 8;"/>
+    <PasswordField fx:id="passwordField" promptText="Password" prefWidth="250" style="-fx-font-size: 13px; -fx-padding: 8;"/>
+    <TextField fx:id="locationField" promptText="Location" prefWidth="250" style="-fx-font-size: 13px; -fx-padding: 8;"/>
+
+    <Button text="Register" onAction="#handleSignup" prefWidth="250" style="-fx-font-size: 14px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
+    <Button text="Back to Login" onAction="#switchToLogin" prefWidth="250" style="-fx-font-size: 14px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
+
+    <Label fx:id="messageLabel" style="-fx-text-fill: red; -fx-font-size: 13px; -fx-font-weight: bold;"/>
 </VBox>
