@@ -107,6 +107,21 @@
                     <Label style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d; -fx-font-style: italic;" text="💡 Hover over data points to see detailed AQI information" />
                 </VBox>
 
+                <!-- Preventive Measures Section -->
+                <VBox fx:id="preventiveMeasuresBox" spacing="15" style="-fx-background-color: linear-gradient(to bottom, #ffffff, #f8f9fa); -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0.5, 0, 5); -fx-border-color: #3498db; -fx-border-width: 3; -fx-border-radius: 15;">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="🛡️ Health Advisory &amp; Safety Recommendations" />
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="animationIndicator" style="-fx-font-size: 24px;" text="✨" />
+                    </HBox>
+                    <Separator style="-fx-background-color: linear-gradient(to right, transparent, #3498db, transparent); -fx-pref-height: 2;" />
+
+                    <VBox fx:id="measuresContent" spacing="12" style="-fx-padding: 10;">
+                        <!-- Dynamic content will be added here by controller -->
+                        <Label style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-padding: 10;" text="📍 Select a location on the map to view personalized health recommendations" />
+                    </VBox>
+                </VBox>
+
                 <!-- Info Section -->
                 <VBox spacing="10" style="-fx-background-color: #e8f4f8; -fx-padding: 15; -fx-background-radius: 8;">
                     <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="ℹ️ AQI Color Guide:" />
