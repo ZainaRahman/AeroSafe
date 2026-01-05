@@ -136,11 +136,10 @@ public class AdminDashboardController implements Initializable {
     /** Load all users from database */
     private void loadAllUsers() {
         new Thread(() -> {
-            try {
-                Connection conn = DBConnector.getInstance().getConnection();
+            try (Connection conn = DBConnector.getInstance().getConnection();
+                 Statement stmt = conn.createStatement()) {
 
                 // Load regular users
-                Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM users");
                 usersList.clear();
                 int userCount = 0;
@@ -152,6 +151,7 @@ public class AdminDashboardController implements Initializable {
                     ));
                     userCount++;
                 }
+                rs.close();
                 int finalUserCount = userCount;
                 Platform.runLater(() -> totalUsersLabel.setText(String.valueOf(finalUserCount)));
 
@@ -167,6 +167,7 @@ public class AdminDashboardController implements Initializable {
                     ));
                     researcherCount++;
                 }
+                rs.close();
                 int finalResearcherCount = researcherCount;
                 Platform.runLater(() -> totalResearchersLabel.setText(String.valueOf(finalResearcherCount)));
 
@@ -182,6 +183,7 @@ public class AdminDashboardController implements Initializable {
                     ));
                     adminCount++;
                 }
+                rs.close();
                 int finalAdminCount = adminCount;
                 Platform.runLater(() -> totalAdminsLabel.setText(String.valueOf(finalAdminCount)));
 
@@ -197,10 +199,9 @@ public class AdminDashboardController implements Initializable {
     /** Load all reports from database */
     private void loadAllReports() {
         new Thread(() -> {
-            try {
-                Connection conn = DBConnector.getInstance().getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM reports ORDER BY id DESC");
+            try (Connection conn = DBConnector.getInstance().getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT * FROM reports ORDER BY id DESC")) {
 
                 reportsList.clear();
                 int count = 0;
@@ -231,8 +232,8 @@ public class AdminDashboardController implements Initializable {
     /** Load active alerts */
     private void loadActiveAlerts() {
         new Thread(() -> {
-            try {
-                Connection conn = DBConnector.getInstance().getConnection();
+            try (Connection conn = DBConnector.getInstance().getConnection();
+                 Statement createStmt = conn.createStatement()) {
 
                 // Create alerts table if not exists
                 String createTable = "CREATE TABLE IF NOT EXISTS alerts(" +
@@ -243,23 +244,23 @@ public class AdminDashboardController implements Initializable {
                         "message TEXT, " +
                         "created_date TEXT, " +
                         "status TEXT DEFAULT 'Active')";
-                conn.createStatement().execute(createTable);
+                createStmt.execute(createTable);
 
                 // Load active alerts
-                ResultSet rs = conn.createStatement().executeQuery(
+                try (ResultSet rs = createStmt.executeQuery(
                     "SELECT * FROM alerts WHERE status='Active' ORDER BY id DESC"
-                );
-
-                alertsList.clear();
-                while (rs.next()) {
-                    alertsList.add(new Alert(
-                        rs.getInt("id"),
-                        rs.getString("alert_type"),
-                        rs.getString("severity"),
-                        rs.getString("location"),
-                        rs.getString("message"),
-                        rs.getString("created_date")
-                    ));
+                )) {
+                    alertsList.clear();
+                    while (rs.next()) {
+                        alertsList.add(new Alert(
+                            rs.getInt("id"),
+                            rs.getString("alert_type"),
+                            rs.getString("severity"),
+                            rs.getString("location"),
+                            rs.getString("message"),
+                            rs.getString("created_date")
+                        ));
+                    }
                 }
 
                 Platform.runLater(this::displayActiveAlerts);
@@ -533,11 +534,9 @@ public class AdminDashboardController implements Initializable {
     }
 
     private void deactivateAlert(int alertId) {
-        try {
-            Connection conn = DBConnector.getInstance().getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE alerts SET status='Inactive' WHERE id=?"
-            );
+        try (Connection conn = DBConnector.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("UPDATE alerts SET status='Inactive' WHERE id=?")) {
+
             stmt.setInt(1, alertId);
             stmt.executeUpdate();
 
@@ -609,6 +608,9 @@ public class AdminDashboardController implements Initializable {
     @FXML
     private void logout() {
         try {
+            // Clear user session
+            SessionManager.getInstance().clearSession();
+
             Stage stage = (Stage) welcomeLabel.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
             stage.setScene(new Scene(loader.load(), 400, 400));
