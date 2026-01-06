@@ -31,27 +31,27 @@ import org.json.JSONObject;
 
 public class ResearcherDashboardController implements Initializable {
 
-    // FXML Components
+
     @FXML private Label welcomeLabel, selectedLocationLabel, statsLabel;
     @FXML private WebView mapView;
     @FXML private TextField locationSearchField, researcherSearchField, publicationSearchField;
     @FXML private StackPane contentPane;
 
-    // Data display labels
+
     @FXML private Label pm25Label, pm10Label, no2Label, o3Label, so2Label, coLabel;
 
-    // Panels
+
     @FXML private ScrollPane dataViewPanel, dataHubPanel, researchersPanel, publicationsPanel;
 
-    // Data Hub Table
+
     @FXML private TableView<AirQualityData> dataHubTable;
     @FXML private TableColumn<AirQualityData, String> dateColumn, locationColumn;
     @FXML private TableColumn<AirQualityData, Double> pm25Column, pm10Column, no2Column, o3Column, so2Column, coColumn;
 
-    // Lists
+
     @FXML private VBox researchersListBox, publicationsListBox;
 
-    // Data storage
+
     private ObservableList<AirQualityData> dataHubList = FXCollections.observableArrayList();
     private double selectedLat = 23.8103;
     private double selectedLon = 90.4125;
@@ -60,22 +60,22 @@ public class ResearcherDashboardController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Load API key
+
         loadApiKey();
 
-        // Setup map
+
         setupMap();
 
-        // Setup Data Hub Table
+
         setupDataHubTable();
 
-        // Load sample researchers
+
         loadSampleResearchers();
 
-        // Load sample publications
+
         loadSamplePublications();
 
-        // Show data view by default
+
         showDataView();
     }
 
@@ -96,7 +96,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Setup interactive map */
+
     private void setupMap() {
         WebEngine engine = mapView.getEngine();
         engine.setJavaScriptEnabled(true);
@@ -120,7 +120,7 @@ public class ResearcherDashboardController implements Initializable {
         });
     }
 
-    /** Called by JavaScript when map is clicked */
+
     public void onMapClick(String city, double lat, double lon) {
         Platform.runLater(() -> {
             selectedLat = lat;
@@ -129,7 +129,7 @@ public class ResearcherDashboardController implements Initializable {
 
             System.out.println("📍 Researcher selected location: " + lat + ", " + lon);
 
-            // Fetch location name
+
             new Thread(() -> {
                 String locationName = getLocationName(lat, lon);
                 Platform.runLater(() -> {
@@ -141,7 +141,7 @@ public class ResearcherDashboardController implements Initializable {
         });
     }
 
-    /** Get location name from coordinates */
+
     private String getLocationName(double lat, double lon) {
         try {
             String urlString = String.format(
@@ -179,7 +179,7 @@ public class ResearcherDashboardController implements Initializable {
         return String.format("Lat: %.4f, Lon: %.4f", lat, lon);
     }
 
-    /** Fetch detailed pollutant data from API */
+
     @FXML
     private void fetchDetailedPollutantData() {
         System.out.println("🔍 Fetching pollutant data...");
@@ -193,7 +193,7 @@ public class ResearcherDashboardController implements Initializable {
 
         selectedLocationLabel.setText("📍 Fetching data for: " + selectedLocation + "...");
 
-        // Reset labels
+
         pm25Label.setText("Loading...");
         pm10Label.setText("Loading...");
         no2Label.setText("Loading...");
@@ -276,7 +276,7 @@ public class ResearcherDashboardController implements Initializable {
         }).start();
     }
 
-    /** Search for location by name */
+
     @FXML
     private void searchLocation() {
         String query = locationSearchField.getText().trim();
@@ -316,7 +316,6 @@ public class ResearcherDashboardController implements Initializable {
                             selectedLon = lon;
                             selectedLocation = displayName;
 
-                            // Center map
                             WebEngine engine = mapView.getEngine();
                             engine.executeScript("map.setView([" + lat + ", " + lon + "], 13);");
 
@@ -335,13 +334,13 @@ public class ResearcherDashboardController implements Initializable {
         }).start();
     }
 
-    /** Refresh current location data */
+
     @FXML
     private void refreshData() {
         fetchDetailedPollutantData();
     }
 
-    /** Add current data to Data Hub */
+
     @FXML
     private void addToDataHub() {
         try {
@@ -360,7 +359,7 @@ public class ResearcherDashboardController implements Initializable {
 
             dataHubList.add(data);
 
-            // Save to database
+
             saveDataToDatabase(data);
 
             showAlert("Success", "Data added to Data Hub successfully!");
@@ -371,12 +370,12 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Save data to database */
-    private void saveDataToDatabase(AirQualityData data) {
-        try {
-            var conn = DBConnector.getInstance().getConnection();
 
-            // Create table if not exists
+    private void saveDataToDatabase(AirQualityData data) {
+        try (var conn = DBConnector.getInstance().getConnection();
+             var createStmt = conn.createStatement()) {
+
+
             String createTable = "CREATE TABLE IF NOT EXISTS research_data(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "timestamp TEXT, " +
@@ -387,21 +386,22 @@ public class ResearcherDashboardController implements Initializable {
                     "o3 REAL, " +
                     "so2 REAL, " +
                     "co REAL)";
-            conn.createStatement().execute(createTable);
+            createStmt.execute(createTable);
 
-            // Insert data
-            var stmt = conn.prepareStatement(
+
+            try (var stmt = conn.prepareStatement(
                     "INSERT INTO research_data(timestamp, location, pm25, pm10, no2, o3, so2, co) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            );
-            stmt.setString(1, data.getTimestamp());
-            stmt.setString(2, data.getLocation());
-            stmt.setDouble(3, data.getPm25());
-            stmt.setDouble(4, data.getPm10());
-            stmt.setDouble(5, data.getNo2());
-            stmt.setDouble(6, data.getO3());
-            stmt.setDouble(7, data.getSo2());
-            stmt.setDouble(8, data.getCo());
-            stmt.executeUpdate();
+            )) {
+                stmt.setString(1, data.getTimestamp());
+                stmt.setString(2, data.getLocation());
+                stmt.setDouble(3, data.getPm25());
+                stmt.setDouble(4, data.getPm10());
+                stmt.setDouble(5, data.getNo2());
+                stmt.setDouble(6, data.getO3());
+                stmt.setDouble(7, data.getSo2());
+                stmt.setDouble(8, data.getCo());
+                stmt.executeUpdate();
+            }
 
             System.out.println("✓ Data saved to database");
         } catch (Exception e) {
@@ -409,7 +409,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Setup Data Hub Table */
+
     private void setupDataHubTable() {
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
@@ -422,17 +422,15 @@ public class ResearcherDashboardController implements Initializable {
 
         dataHubTable.setItems(dataHubList);
 
-        // Load existing data from database
         loadDataFromDatabase();
     }
 
-    /** Load data from database */
+
     private void loadDataFromDatabase() {
         new Thread(() -> {
-            try {
-                var conn = DBConnector.getInstance().getConnection();
-                var stmt = conn.createStatement();
-                var rs = stmt.executeQuery("SELECT * FROM research_data ORDER BY id DESC LIMIT 100");
+            try (var conn = DBConnector.getInstance().getConnection();
+                 var stmt = conn.createStatement();
+                 var rs = stmt.executeQuery("SELECT * FROM research_data ORDER BY id DESC LIMIT 100")) {
 
                 while (rs.next()) {
                     AirQualityData data = new AirQualityData(
@@ -454,7 +452,7 @@ public class ResearcherDashboardController implements Initializable {
         }).start();
     }
 
-    /** Calculate statistics from Data Hub */
+
     @FXML
     private void calculateStatistics() {
         if (dataHubList.isEmpty()) {
@@ -489,7 +487,7 @@ public class ResearcherDashboardController implements Initializable {
         System.out.println("✓ Statistics calculated");
     }
 
-    /** Clear Data Hub */
+
     @FXML
     private void clearDataHub() {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
@@ -501,10 +499,10 @@ public class ResearcherDashboardController implements Initializable {
             dataHubList.clear();
             statsLabel.setText("");
 
-            // Clear from database
-            try {
-                var conn = DBConnector.getInstance().getConnection();
-                conn.createStatement().execute("DELETE FROM research_data");
+
+            try (var conn = DBConnector.getInstance().getConnection();
+                 var stmt = conn.createStatement()) {
+                stmt.execute("DELETE FROM research_data");
                 System.out.println("✓ Data Hub cleared");
             } catch (Exception e) {
                 System.err.println("⚠️ Failed to clear database: " + e.getMessage());
@@ -512,7 +510,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Export data to CSV */
+
     @FXML
     private void exportData() {
         if (dataHubList.isEmpty()) {
@@ -548,7 +546,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Load sample researchers */
+
     private void loadSampleResearchers() {
         String[] researchers = {
             "Dr. Sarah Chen|Air Quality Modeling|50 publications|University of California",
@@ -565,7 +563,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Create researcher card */
+
     private VBox createResearcherCard(String name, String specialization, String publications, String institution) {
         VBox card = new VBox(8);
         card.setPadding(new Insets(15));
@@ -591,7 +589,7 @@ public class ResearcherDashboardController implements Initializable {
         return card;
     }
 
-    /** Search researchers */
+
     @FXML
     private void searchResearcher() {
         String query = researcherSearchField.getText().trim().toLowerCase();
@@ -611,7 +609,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Load sample publications */
+
     private void loadSamplePublications() {
         String[] publications = {
             "Impact of PM2.5 on Urban Health|Dr. Sarah Chen|2024|Nature Climate Change",
@@ -628,7 +626,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Create publication card */
+
     private VBox createPublicationCard(String title, String author, String year, String journal) {
         VBox card = new VBox(8);
         card.setPadding(new Insets(15));
@@ -652,7 +650,7 @@ public class ResearcherDashboardController implements Initializable {
         return card;
     }
 
-    /** Search publications */
+
     @FXML
     private void searchPublications() {
         String query = publicationSearchField.getText().trim().toLowerCase();
@@ -672,7 +670,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    // Panel switching methods
+
     @FXML
     private void showDataView() {
         hideAllPanels();
@@ -704,10 +702,12 @@ public class ResearcherDashboardController implements Initializable {
         publicationsPanel.setVisible(false);
     }
 
-    /** Logout */
     @FXML
     private void logout() {
         try {
+
+            SessionManager.getInstance().clearSession();
+
             Stage stage = (Stage) welcomeLabel.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
             stage.setScene(new Scene(loader.load(), 400, 400));
@@ -717,7 +717,7 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-    /** Show alert dialog */
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -726,7 +726,7 @@ public class ResearcherDashboardController implements Initializable {
         alert.showAndWait();
     }
 
-    /** Air Quality Data Model */
+
     public static class AirQualityData {
         private String timestamp;
         private String location;
@@ -744,7 +744,6 @@ public class ResearcherDashboardController implements Initializable {
             this.co = co;
         }
 
-        // Getters
         public String getTimestamp() { return timestamp; }
         public String getLocation() { return location; }
         public double getPm25() { return pm25; }
