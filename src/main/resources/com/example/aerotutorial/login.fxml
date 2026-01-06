@@ -14,8 +14,18 @@
         <ComboBox fx:id="roleComboBox" promptText="Choose Role" prefWidth="250" style="-fx-font-size: 13px;"/>
     </VBox>
 
-    <TextField fx:id="usernameField" promptText="Username" prefWidth="250" style="-fx-font-size: 13px; -fx-padding: 8;"/>
-    <PasswordField fx:id="passwordField" promptText="Password" prefWidth="250" style="-fx-font-size: 13px; -fx-padding: 8;"/>
+    <TextField fx:id="usernameField" promptText="Username or Email" prefWidth="250" style="-fx-font-size: 13px; -fx-padding: 8;"/>
+
+    <!-- Password field with visibility toggle -->
+    <StackPane prefWidth="250">
+        <PasswordField fx:id="passwordField" promptText="Password" prefWidth="250" style="-fx-font-size: 13px; -fx-padding: 8;"/>
+        <TextField fx:id="passwordTextField" promptText="Password" prefWidth="250" visible="false" managed="false" style="-fx-font-size: 13px; -fx-padding: 8;"/>
+        <Button fx:id="togglePasswordBtn" text="👁" onAction="#togglePasswordVisibility"
+                style="-fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 16px;"
+                StackPane.alignment="CENTER_RIGHT" prefWidth="30" prefHeight="30"/>
+    </StackPane>
+
+    <Hyperlink text="Forgot Password?" onAction="#handleForgotPassword" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px; -fx-cursor: hand;"/>
 
     <Button text="Login" onAction="#handleLogin" prefWidth="250" style="-fx-font-size: 14px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
     <Button text="Sign Up" onAction="#switchToSignup" prefWidth="250" style="-fx-font-size: 14px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
