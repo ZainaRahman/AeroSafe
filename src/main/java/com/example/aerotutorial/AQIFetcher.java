@@ -13,18 +13,11 @@ import java.time.ZoneId;
 import java.util.*;
 
 public class AQIFetcher {
-    // Load API key securely from config.properties file
-    // The API key is NOT hardcoded in the source code!
+
     private static String getApiKey() {
         return ConfigLoader.getApiKey();
     }
 
-    /**
-     * Fetch AQI from OpenWeatherMap for given coordinates.
-     * @param lat Latitude
-     * @param lon Longitude
-     * @return AQI as integer (1-500), -1 if failed
-     */
     public static int fetchAQI(double lat, double lon) {
         try {
             String apiKey = getApiKey();
@@ -35,7 +28,6 @@ public class AQIFetcher {
                     lat, lon, apiKey
             );
 
-            // Log URL with masked API key for debugging
             String maskedUrl = urlStr.replaceAll("appid=[^&]+", "appid=****");
             System.out.println("Calling API: " + maskedUrl);
 
@@ -50,7 +42,7 @@ public class AQIFetcher {
                 System.out.println("❌ API Error: " + responseCode);
                 System.out.println("API URL: " + urlStr);
 
-                // Read error response
+
                 try (BufferedReader errorReader = new BufferedReader(
                         new InputStreamReader(conn.getErrorStream()))) {
                     StringBuilder errorResponse = new StringBuilder();
@@ -78,7 +70,7 @@ public class AQIFetcher {
             JSONObject listItem = json.getJSONArray("list").getJSONObject(0);
             JSONObject components = listItem.getJSONObject("components");
 
-            // Get all pollutant concentrations from the API
+
             double pm25 = components.optDouble("pm2_5", 0);
             double pm10 = components.optDouble("pm10", 0);
             double no2 = components.optDouble("no2", 0);
@@ -91,7 +83,7 @@ public class AQIFetcher {
             System.out.println("NO2: " + no2 + " μg/m³, O3: " + o3 + " μg/m³");
             System.out.println("SO2: " + so2 + " μg/m³, CO: " + co + " μg/m³");
 
-            // Calculate AQI for each pollutant and take the maximum (EPA standard)
+
             int aqiPM25 = calculateAqiFromPM25(pm25);
             int aqiPM10 = calculateAqiFromPM10(pm10);
             int aqiNO2 = calculateAqiFromNO2(no2);
@@ -104,7 +96,7 @@ public class AQIFetcher {
             System.out.println("NO2 AQI: " + aqiNO2 + ", O3 AQI: " + aqiO3);
             System.out.println("SO2 AQI: " + aqiSO2 + ", CO AQI: " + aqiCO);
 
-            // The overall AQI is the maximum of all pollutant AQIs (EPA standard)
+
             int finalAqi = Math.max(aqiPM25, Math.max(aqiPM10, Math.max(aqiNO2,
                           Math.max(aqiO3, Math.max(aqiSO2, aqiCO)))));
 
@@ -119,18 +111,12 @@ public class AQIFetcher {
         }
     }
 
-    /**
-     * Fetch historical AQI data for the last X days
-     * @param lat Latitude
-     * @param lon Longitude
-     * @param days Number of days to fetch (e.g., 7 for last week)
-     * @return Map of LocalDate to AQI values, ordered from oldest to newest
-     */
+
     public static Map<LocalDate, Integer> fetchHistoricalAQI(double lat, double lon, int days) {
         Map<LocalDate, Integer> history = new LinkedHashMap<>();
 
         try {
-            // Calculate Unix timestamps for date range
+
             long endTime = System.currentTimeMillis() / 1000; // Now (in seconds)
             long startTime = endTime - ((long)days * 24 * 60 * 60); // X days ago
 
@@ -155,7 +141,7 @@ public class AQIFetcher {
             if (responseCode != 200) {
                 System.out.println("❌ Historical API Error: " + responseCode);
 
-                // Read error response
+
                 try (BufferedReader errorReader = new BufferedReader(
                         new InputStreamReader(conn.getErrorStream()))) {
                     StringBuilder errorResponse = new StringBuilder();
@@ -183,7 +169,6 @@ public class AQIFetcher {
 
             System.out.println("Received " + list.length() + " data points from historical API");
 
-            // Group by date and collect AQI values per day
             Map<LocalDate, List<Integer>> dailyData = new HashMap<>();
 
             for (int i = 0; i < list.length(); i++) {
@@ -199,7 +184,7 @@ public class AQIFetcher {
                 dailyData.computeIfAbsent(date, k -> new ArrayList<>()).add(aqi);
             }
 
-            // Average AQI per day and sort by date
+
             List<LocalDate> sortedDates = new ArrayList<>(dailyData.keySet());
             Collections.sort(sortedDates);
 
@@ -223,11 +208,7 @@ public class AQIFetcher {
         return history;
     }
 
-    /**
-     * Calculate overall AQI from all pollutant components
-     * @param components JSONObject containing all pollutant concentrations
-     * @return Overall AQI (maximum of all individual pollutant AQIs)
-     */
+
     private static int calculateOverallAQI(JSONObject components) {
         double pm25 = components.optDouble("pm2_5", 0);
         double pm10 = components.optDouble("pm10", 0);
@@ -250,15 +231,10 @@ public class AQIFetcher {
                Math.max(aqiSO2, aqiCO)))));
     }
 
-    /**
-     * Calculate AQI from PM2.5 concentration using EPA formula
-     * @param pm25 PM2.5 concentration in μg/m³
-     * @return AQI value
-     */
+
     public static int calculateAqiFromPM25(double pm25) {
         if (pm25 < 0) return 0;
 
-        // EPA AQI breakpoints for PM2.5 (24-hour average)
         if (pm25 <= 12.0) {
             return (int) linearScale(pm25, 0, 12.0, 0, 50);
         } else if (pm25 <= 35.4) {
@@ -275,19 +251,14 @@ public class AQIFetcher {
         } else if (pm25 <= 500.4) {
             return (int) linearScale(pm25, 350.5, 500.4, 401, 500);
         } else {
-            return 500; // Max AQI
+            return 500;
         }
     }
 
-    /**
-     * Calculate AQI from PM10 concentration using EPA formula
-     * @param pm10 PM10 concentration in μg/m³
-     * @return AQI value
-     */
+
     public static int calculateAqiFromPM10(double pm10) {
         if (pm10 < 0) return 0;
 
-        // EPA AQI breakpoints for PM10 (24-hour average)
         if (pm10 <= 54) {
             return (int) linearScale(pm10, 0, 54, 0, 50);
         } else if (pm10 <= 154) {
@@ -307,18 +278,14 @@ public class AQIFetcher {
         }
     }
 
-    /**
-     * Calculate AQI from NO2 concentration
-     * @param no2 NO2 concentration in μg/m³
-     * @return AQI value
-     */
+
     public static int calculateAqiFromNO2(double no2) {
         if (no2 < 0) return 0;
 
-        // Convert μg/m³ to ppb (at 25°C and 1 atm): ppb = μg/m³ × 0.5319
+
         double no2_ppb = no2 * 0.5319;
 
-        // EPA AQI breakpoints for NO2 (1-hour average in ppb)
+
         if (no2_ppb <= 53) {
             return (int) linearScale(no2_ppb, 0, 53, 0, 50);
         } else if (no2_ppb <= 100) {
@@ -338,18 +305,14 @@ public class AQIFetcher {
         }
     }
 
-    /**
-     * Calculate AQI from O3 (Ozone) concentration
-     * @param o3 O3 concentration in μg/m³
-     * @return AQI value
-     */
+
     public static int calculateAqiFromO3(double o3) {
         if (o3 < 0) return 0;
 
-        // Convert μg/m³ to ppb: ppb = μg/m³ × 0.5087
+
         double o3_ppb = o3 * 0.5087;
 
-        // EPA AQI breakpoints for O3 (8-hour average in ppb)
+
         if (o3_ppb <= 54) {
             return (int) linearScale(o3_ppb, 0, 54, 0, 50);
         } else if (o3_ppb <= 70) {
@@ -361,22 +324,16 @@ public class AQIFetcher {
         } else if (o3_ppb <= 200) {
             return (int) linearScale(o3_ppb, 106, 200, 201, 300);
         } else {
-            return 300; // Max for 8-hour O3
+            return 300;
         }
     }
 
-    /**
-     * Calculate AQI from SO2 concentration
-     * @param so2 SO2 concentration in μg/m³
-     * @return AQI value
-     */
+
     public static int calculateAqiFromSO2(double so2) {
         if (so2 < 0) return 0;
 
-        // Convert μg/m³ to ppb: ppb = μg/m³ × 0.3817
         double so2_ppb = so2 * 0.3817;
 
-        // EPA AQI breakpoints for SO2 (1-hour average in ppb)
         if (so2_ppb <= 35) {
             return (int) linearScale(so2_ppb, 0, 35, 0, 50);
         } else if (so2_ppb <= 75) {
@@ -396,18 +353,14 @@ public class AQIFetcher {
         }
     }
 
-    /**
-     * Calculate AQI from CO concentration
-     * @param co CO concentration in μg/m³
-     * @return AQI value
-     */
+
     public static int calculateAqiFromCO(double co) {
         if (co < 0) return 0;
 
-        // Convert μg/m³ to ppm: ppm = μg/m³ × 0.000873
+
         double co_ppm = co * 0.000873;
 
-        // EPA AQI breakpoints for CO (8-hour average in ppm)
+
         if (co_ppm <= 4.4) {
             return (int) linearScale(co_ppm, 0, 4.4, 0, 50);
         } else if (co_ppm <= 9.4) {
@@ -427,9 +380,7 @@ public class AQIFetcher {
         }
     }
 
-    /**
-     * Linear interpolation helper
-     */
+
     private static double linearScale(double value, double inLow, double inHigh, double outLow, double outHigh) {
         return ((value - inLow) / (inHigh - inLow)) * (outHigh - outLow) + outLow;
     }

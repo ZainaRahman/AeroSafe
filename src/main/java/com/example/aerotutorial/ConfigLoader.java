@@ -4,17 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * Configuration loader for reading API keys and other sensitive data
- * from external properties files.
- */
+
 public class ConfigLoader {
     private static final Properties properties = new Properties();
     private static boolean loaded = false;
 
-    /**
-     * Load configuration from config.properties file
-     */
+
     static void loadConfig() {
         if (loaded) return;
 
@@ -42,10 +37,7 @@ public class ConfigLoader {
         }
     }
 
-    /**
-     * Get the OpenWeatherMap API key
-     * @return API key string
-     */
+
     public static String getApiKey() {
         if (!loaded) {
             loadConfig();
@@ -62,11 +54,7 @@ public class ConfigLoader {
         return apiKey.trim();
     }
 
-    /**
-     * Get any property value by key
-     * @param key Property key
-     * @return Property value
-     */
+
     public static String getProperty(String key) {
         if (!loaded) {
             loadConfig();
@@ -74,12 +62,7 @@ public class ConfigLoader {
         return properties.getProperty(key);
     }
 
-    /**
-     * Get property with default value
-     * @param key Property key
-     * @param defaultValue Default value if key not found
-     * @return Property value or default
-     */
+
     public static String getProperty(String key, String defaultValue) {
         if (!loaded) {
             loadConfig();
