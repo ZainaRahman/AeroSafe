@@ -26,36 +26,36 @@ import java.util.ResourceBundle;
 
 public class AdminDashboardController implements Initializable {
 
-    // FXML Components
+
     @FXML private Label welcomeLabel, totalUsersLabel, totalResearchersLabel, totalAdminsLabel;
     @FXML private Label totalReportsLabel, goodAqiDaysLabel, moderateAqiDaysLabel, unhealthyAqiDaysLabel;
     @FXML private Label affectedUsersLabel, policyReportLabel;
     @FXML private StackPane contentPane;
 
-    // Panels
+
     @FXML private ScrollPane usersPanel, reportsPanel, alertsPanel, policyDataPanel;
 
-    // Users Tables
+
     @FXML private TableView<User> usersTable, researchersTable, adminsTable;
     @FXML private TableColumn<User, Integer> userIdCol, researcherIdCol, adminIdCol;
     @FXML private TableColumn<User, String> userNameCol, userLocationCol;
     @FXML private TableColumn<User, String> researcherNameCol, researcherLocationCol;
     @FXML private TableColumn<User, String> adminNameCol, adminLocationCol;
 
-    // Reports Table
+
     @FXML private TableView<Report> reportsTable;
     @FXML private TableColumn<Report, Integer> reportIdCol;
     @FXML private TableColumn<Report, String> reportDateCol, reporterNameCol, reportLocationCol;
     @FXML private TableColumn<Report, String> reportIssueCol, reportSeverityCol, reportStatusCol;
     @FXML private ComboBox<String> reportStatusFilter;
 
-    // Alerts
+
     @FXML private ComboBox<String> alertTypeCombo, alertSeverityCombo;
     @FXML private TextField alertLocationField;
     @FXML private TextArea alertMessageArea;
     @FXML private VBox activeAlertsBox;
 
-    // Data
+
     private ObservableList<User> usersList = FXCollections.observableArrayList();
     private ObservableList<User> researchersList = FXCollections.observableArrayList();
     private ObservableList<User> adminsList = FXCollections.observableArrayList();
@@ -68,38 +68,38 @@ public class AdminDashboardController implements Initializable {
         setupReportsTable();
         setupAlertControls();
 
-        // Load data
+
         loadAllUsers();
         loadAllReports();
         loadActiveAlerts();
         calculatePolicyData();
 
-        // Show users panel by default
+
         showUsers();
     }
 
-    /** Setup users tables */
+
     private void setupUsersTables() {
-        // Users table
+
         userIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         userLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
         usersTable.setItems(usersList);
 
-        // Researchers table
+
         researcherIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         researcherNameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         researcherLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
         researchersTable.setItems(researchersList);
 
-        // Admins table
+
         adminIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         adminNameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         adminLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
         adminsTable.setItems(adminsList);
     }
 
-    /** Setup reports table */
+
     private void setupReportsTable() {
         reportIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         reportDateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
@@ -110,12 +110,12 @@ public class AdminDashboardController implements Initializable {
         reportStatusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
         reportsTable.setItems(reportsList);
 
-        // Status filter
+
         reportStatusFilter.getItems().addAll("All", "Pending", "Resolved", "In Progress");
         reportStatusFilter.setValue("All");
     }
 
-    /** Setup alert controls */
+
     private void setupAlertControls() {
         alertTypeCombo.getItems().addAll(
             "High AQI Alert",
@@ -133,13 +133,13 @@ public class AdminDashboardController implements Initializable {
         );
     }
 
-    /** Load all users from database */
+
     private void loadAllUsers() {
         new Thread(() -> {
             try (Connection conn = DBConnector.getInstance().getConnection();
                  Statement stmt = conn.createStatement()) {
 
-                // Load regular users
+
                 ResultSet rs = stmt.executeQuery("SELECT * FROM users");
                 usersList.clear();
                 int userCount = 0;
@@ -155,7 +155,7 @@ public class AdminDashboardController implements Initializable {
                 int finalUserCount = userCount;
                 Platform.runLater(() -> totalUsersLabel.setText(String.valueOf(finalUserCount)));
 
-                // Load researchers
+
                 rs = stmt.executeQuery("SELECT * FROM researchers");
                 researchersList.clear();
                 int researcherCount = 0;
@@ -171,7 +171,7 @@ public class AdminDashboardController implements Initializable {
                 int finalResearcherCount = researcherCount;
                 Platform.runLater(() -> totalResearchersLabel.setText(String.valueOf(finalResearcherCount)));
 
-                // Load admins
+
                 rs = stmt.executeQuery("SELECT * FROM admin");
                 adminsList.clear();
                 int adminCount = 0;
@@ -196,7 +196,7 @@ public class AdminDashboardController implements Initializable {
         }).start();
     }
 
-    /** Load all reports from database */
+
     private void loadAllReports() {
         new Thread(() -> {
             try (Connection conn = DBConnector.getInstance().getConnection();
@@ -229,13 +229,13 @@ public class AdminDashboardController implements Initializable {
         }).start();
     }
 
-    /** Load active alerts */
+
     private void loadActiveAlerts() {
         new Thread(() -> {
             try (Connection conn = DBConnector.getInstance().getConnection();
                  Statement createStmt = conn.createStatement()) {
 
-                // Create alerts table if not exists
+
                 String createTable = "CREATE TABLE IF NOT EXISTS alerts(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "alert_type TEXT, " +
@@ -246,7 +246,7 @@ public class AdminDashboardController implements Initializable {
                         "status TEXT DEFAULT 'Active')";
                 createStmt.execute(createTable);
 
-                // Load active alerts
+
                 try (ResultSet rs = createStmt.executeQuery(
                     "SELECT * FROM alerts WHERE status='Active' ORDER BY id DESC"
                 )) {
@@ -272,7 +272,7 @@ public class AdminDashboardController implements Initializable {
         }).start();
     }
 
-    /** Display active alerts */
+
     private void displayActiveAlerts() {
         activeAlertsBox.getChildren().clear();
 
@@ -289,7 +289,7 @@ public class AdminDashboardController implements Initializable {
         }
     }
 
-    /** Create alert card */
+
     private VBox createAlertCard(Alert alert) {
         VBox card = new VBox(10);
         card.setPadding(new Insets(15));
@@ -321,7 +321,6 @@ public class AdminDashboardController implements Initializable {
         return card;
     }
 
-    /** Get severity color */
     private String getSeverityColor(String severity) {
         switch (severity) {
             case "Critical": return "#ffebee";
@@ -332,19 +331,19 @@ public class AdminDashboardController implements Initializable {
         }
     }
 
-    /** Calculate policy data */
+
     private void calculatePolicyData() {
-        // Generate sample policy statistics
+
         goodAqiDaysLabel.setText("18");
         moderateAqiDaysLabel.setText("9");
         unhealthyAqiDaysLabel.setText("3");
 
-        // Calculate affected users (total users + researchers)
+
         int totalAffected = usersList.size() + researchersList.size();
         affectedUsersLabel.setText(String.valueOf(totalAffected));
     }
 
-    // Action Methods
+
 
     @FXML
     private void showUsers() {
@@ -519,13 +518,13 @@ public class AdminDashboardController implements Initializable {
 
             showAlert("Alert Issued", "Public health alert has been issued successfully!");
 
-            // Clear fields
+
             alertTypeCombo.setValue(null);
             alertSeverityCombo.setValue(null);
             alertLocationField.clear();
             alertMessageArea.clear();
 
-            // Reload alerts
+
             loadActiveAlerts();
 
         } catch (Exception e) {
@@ -608,7 +607,7 @@ public class AdminDashboardController implements Initializable {
     @FXML
     private void logout() {
         try {
-            // Clear user session
+
             SessionManager.getInstance().clearSession();
 
             Stage stage = (Stage) welcomeLabel.getScene().getWindow();
@@ -628,7 +627,7 @@ public class AdminDashboardController implements Initializable {
         alert.showAndWait();
     }
 
-    // Model Classes
+
 
     public static class User {
         private final SimpleIntegerProperty id;

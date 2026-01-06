@@ -35,7 +35,7 @@ public class ReportIssueController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Populate issue types
+
         issueTypeComboBox.getItems().addAll(
             "High AQI / Poor Air Quality",
             "Industrial Pollution",
@@ -46,7 +46,7 @@ public class ReportIssueController implements Initializable {
             "Other Environmental Concern"
         );
 
-        // Populate severity levels
+
         severityComboBox.getItems().addAll(
             "Low - Minor concern",
             "Medium - Noticeable impact",
@@ -54,7 +54,7 @@ public class ReportIssueController implements Initializable {
             "Critical - Immediate action required"
         );
 
-        // Set default values
+
         issueTypeComboBox.setValue("High AQI / Poor Air Quality");
         severityComboBox.setValue("Medium - Noticeable impact");
     }
@@ -69,7 +69,7 @@ public class ReportIssueController implements Initializable {
         String description = descriptionArea.getText().trim();
         String contact = contactField.getText().trim();
 
-        // Validation
+
         if (reporterName.isEmpty() || location.isEmpty() || description.isEmpty()) {
             statusLabel.setStyle("-fx-text-fill: red;");
             statusLabel.setText("❌ Please fill in all required fields (Name, Location, Description)");
@@ -85,9 +85,15 @@ public class ReportIssueController implements Initializable {
         try {
             Connection conn = DBConnector.getInstance().getConnection();
 
-            // Create table if not exists
+
+            SessionManager session = SessionManager.getInstance();
+            int userId = session.getUserId();
+            System.out.println("📝 Submitting report for user ID: " + userId);
+
+
             String createTableSQL = "CREATE TABLE IF NOT EXISTS reports(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "user_id INTEGER, " +
                     "reporter_name TEXT NOT NULL, " +
                     "location TEXT NOT NULL, " +
                     "issue_type TEXT NOT NULL, " +
@@ -96,22 +102,24 @@ public class ReportIssueController implements Initializable {
                     "description TEXT NOT NULL, " +
                     "contact TEXT, " +
                     "status TEXT DEFAULT 'Pending', " +
-                    "submitted_date TEXT NOT NULL)";
+                    "submitted_date TEXT NOT NULL, " +
+                    "FOREIGN KEY(user_id) REFERENCES users(id))";
             conn.createStatement().execute(createTableSQL);
 
-            // Insert report
+
             PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO reports(reporter_name, location, issue_type, severity, aqi_value, description, contact, submitted_date) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO reports(user_id, reporter_name, location, issue_type, severity, aqi_value, description, contact, submitted_date) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
-            stmt.setString(1, reporterName);
-            stmt.setString(2, location);
-            stmt.setString(3, issueType);
-            stmt.setString(4, severity);
-            stmt.setString(5, aqiValue.isEmpty() ? "Not specified" : aqiValue);
-            stmt.setString(6, description);
-            stmt.setString(7, contact.isEmpty() ? "Not provided" : contact);
-            stmt.setString(8, LocalDateTime.now().toString());
+            stmt.setInt(1, userId);
+            stmt.setString(2, reporterName);
+            stmt.setString(3, location);
+            stmt.setString(4, issueType);
+            stmt.setString(5, severity);
+            stmt.setString(6, aqiValue.isEmpty() ? "Not specified" : aqiValue);
+            stmt.setString(7, description);
+            stmt.setString(8, contact.isEmpty() ? "Not provided" : contact);
+            stmt.setString(9, LocalDateTime.now().toString());
 
             int rows = stmt.executeUpdate();
 
@@ -120,7 +128,7 @@ public class ReportIssueController implements Initializable {
                 statusLabel.setStyle("-fx-text-fill: green; -fx-font-size: 14px;");
                 statusLabel.setText("✅ Report submitted successfully! Government officials will review your report.");
 
-                // Clear form after 2 seconds and return to dashboard
+
                 new Thread(() -> {
                     try {
                         Thread.sleep(2000);

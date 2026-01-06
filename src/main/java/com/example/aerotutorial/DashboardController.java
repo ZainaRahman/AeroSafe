@@ -513,6 +513,9 @@ public class DashboardController {
     @FXML
     private void logout() {
         try {
+            // Clear user session
+            SessionManager.getInstance().clearSession();
+
             Stage stage = (Stage) mapView.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
             Scene loginScene = new Scene(loader.load(), 400, 300);

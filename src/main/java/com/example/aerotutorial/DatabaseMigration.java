@@ -3,10 +3,7 @@ package com.example.aerotutorial;
 import java.sql.Connection;
 import java.sql.Statement;
 
-/**
- * Database migration utility to fix table schemas
- * Run this once to update the database structure
- */
+
 public class DatabaseMigration {
 
     public static void migrateDatabase() {
@@ -15,14 +12,14 @@ public class DatabaseMigration {
         try (Connection conn = DBConnector.getInstance().getConnection();
              Statement stmt = conn.createStatement()) {
 
-            // Drop old tables with incorrect schema
+
             System.out.println("  → Dropping old researchers table...");
             stmt.executeUpdate("DROP TABLE IF EXISTS researchers");
 
             System.out.println("  → Dropping old admin table...");
             stmt.executeUpdate("DROP TABLE IF EXISTS admin");
 
-            // Recreate tables with correct schema
+
             System.out.println("  → Creating researchers table with correct schema...");
             stmt.executeUpdate("CREATE TABLE researchers(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -47,9 +44,7 @@ public class DatabaseMigration {
         }
     }
 
-    /**
-     * Run this main method ONCE to migrate the database
-     */
+
     public static void main(String[] args) {
         System.out.println("========================================");
         System.out.println("  DATABASE MIGRATION UTILITY");

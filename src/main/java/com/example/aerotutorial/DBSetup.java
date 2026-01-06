@@ -9,7 +9,7 @@ public class DBSetup {
         Connection conn = DBConnector.getInstance().getConnection();
         try (Statement stmt = conn.createStatement()) {
 
-            // Check if tables need migration (have old schema with 'name' and 'email' columns)
+
             boolean needsMigration = checkIfMigrationNeeded(conn);
 
             if (needsMigration) {
@@ -17,28 +17,34 @@ public class DBSetup {
                 DatabaseMigration.migrateDatabase();
             }
 
-            // Create users table
+
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS users(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "username TEXT UNIQUE NOT NULL, " +
+                    "email TEXT UNIQUE NOT NULL, " +
                     "password TEXT NOT NULL, " +
-                    "location TEXT)");
+                    "location TEXT, " +
+                    "email_verified INTEGER DEFAULT 1)");
 
-            // Create researchers table with same structure
+
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS researchers(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "username TEXT UNIQUE NOT NULL, " +
+                    "email TEXT UNIQUE NOT NULL, " +
                     "password TEXT NOT NULL, " +
-                    "location TEXT)");
+                    "location TEXT, " +
+                    "email_verified INTEGER DEFAULT 1)");
 
-            // Create admin table with same structure
+
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS admin(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "username TEXT UNIQUE NOT NULL, " +
+                    "email TEXT UNIQUE NOT NULL, " +
                     "password TEXT NOT NULL, " +
-                    "location TEXT)");
+                    "location TEXT, " +
+                    "email_verified INTEGER DEFAULT 1)");
 
-            // Create air quality data table
+
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS aq_data(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "city TEXT, " +
@@ -47,7 +53,7 @@ public class DBSetup {
                     "pm10 REAL, " +
                     "aqi INTEGER)");
 
-            // Create reports table for user-submitted environmental issues
+
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS reports(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "reporter_name TEXT NOT NULL, " +
@@ -60,7 +66,7 @@ public class DBSetup {
                     "status TEXT DEFAULT 'Pending', " +
                     "submitted_date TEXT NOT NULL)");
 
-            // Create research data table for researcher dashboard
+
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS research_data(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "timestamp TEXT, " +
@@ -72,13 +78,24 @@ public class DBSetup {
                     "so2 REAL, " +
                     "co REAL)");
 
+
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS search_history(" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "user_id INTEGER NOT NULL, " +
+                    "location_name TEXT NOT NULL, " +
+                    "latitude REAL NOT NULL, " +
+                    "longitude REAL NOT NULL, " +
+                    "search_date TEXT NOT NULL, " +
+                    "FOREIGN KEY(user_id) REFERENCES users(id))");
+
             System.out.println("✓ All database tables ready!");
             System.out.println("  - users table");
             System.out.println("  - researchers table");
             System.out.println("  - admin table");
             System.out.println("  - aq_data table");
-            System.out.println("  - reports table");
+            System.out.println("  - reports table (with user_id)");
             System.out.println("  - research_data table");
+            System.out.println("  - search_history table (user-specific)");
         } catch (Exception e) {
             System.err.println("❌ Error creating database tables:");
             e.printStackTrace();

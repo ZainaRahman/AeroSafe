@@ -28,13 +28,12 @@ public class PredictionEngine {
         double slope = (n * sumXY - sumX * sumY) / denom;
         double intercept = (sumY - slope * sumX) / n;
 
-        double pred = intercept + slope * n; // next day
-        pred = Math.max(0, Math.min(500, pred)); // clamp 0-500
+        double pred = intercept + slope * n;
+        pred = Math.max(0, Math.min(500, pred));
 
         return new PredictionResult(pred, slope, intercept);
     }
 
-    // PredictionResult class
     public static class PredictionResult {
         public final double predicted;
         public final double slope;
