@@ -81,26 +81,51 @@
             </ScrollPane>
 
             <ScrollPane fx:id="dataHubPanel" fitToWidth="true" visible="false">
-                <VBox spacing="15" style="-fx-padding: 20;">
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="🗄️ Data Hub" />
-                        <TableView fx:id="dataHubTable" prefHeight="400">
-                            <columns>
-                                <TableColumn fx:id="dateColumn" text="Date" prefWidth="120" />
-                                <TableColumn fx:id="locationColumn" text="Location" prefWidth="200" />
-                                <TableColumn fx:id="pm25Column" text="PM2.5" prefWidth="80" />
-                                <TableColumn fx:id="pm10Column" text="PM10" prefWidth="80" />
-                                <TableColumn fx:id="no2Column" text="NO₂" prefWidth="80" />
-                                <TableColumn fx:id="o3Column" text="O₃" prefWidth="80" />
-                                <TableColumn fx:id="so2Column" text="SO₂" prefWidth="80" />
-                                <TableColumn fx:id="coColumn" text="CO" prefWidth="80" />
-                            </columns>
-                        </TableView>
-                        <HBox spacing="10">
-                            <Button onAction="#calculateStatistics" style="-fx-font-size: 13px; -fx-padding: 10 15; -fx-background-color: #9b59b6; -fx-text-fill: white;" text="📊 Stats" />
-                            <Button onAction="#clearDataHub" style="-fx-font-size: 13px; -fx-padding: 10 15; -fx-background-color: #e74c3c; -fx-text-fill: white;" text="🗑️ Clear" />
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <!-- Header Section -->
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+                        <HBox alignment="CENTER_LEFT" spacing="20">
+                            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="🗄️ Data Hub" HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="totalRecordsLabel" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;" text="Total Records: 0"/>
                         </HBox>
-                        <Label fx:id="statsLabel" style="-fx-font-size: 13px; -fx-padding: 10; -fx-background-color: #ecf0f1;" wrapText="true"/>
+                        <Separator />
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Button onAction="#refreshDataHub" style="-fx-font-size: 13px; -fx-padding: 10 15; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" text="🔄 Refresh" />
+                            <Button onAction="#clearDataHub" style="-fx-font-size: 13px; -fx-padding: 10 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" text="🗑️ Clear All" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Statistics Cards with Pie Chart -->
+                    <VBox fx:id="statisticsSection" spacing="15" visible="false">
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="📊 Statistical Analysis" />
+
+                        <HBox spacing="20">
+                            <!-- Statistics Summary Box -->
+                            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" HBox.hgrow="ALWAYS">
+                                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Average Pollutant Levels" />
+                                <Separator />
+                                <Label fx:id="statsLabel" style="-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-line-spacing: 5;" wrapText="true"/>
+                            </VBox>
+
+                            <!-- Pie Chart Container -->
+                            <VBox spacing="10" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" prefWidth="400">
+                                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Pollutant Distribution" />
+                                <javafx.scene.chart.PieChart fx:id="pollutantPieChart" prefHeight="300" prefWidth="350" legendVisible="true"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Data Cards Container -->
+                    <VBox spacing="15">
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="📋 Research Data Records" />
+                        <VBox fx:id="dataHubTilesContainer" spacing="15"/>
+
+                        <!-- Empty State -->
+                        <VBox fx:id="emptyStateBox" alignment="CENTER" spacing="15" style="-fx-background-color: white; -fx-padding: 40; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                            <Label style="-fx-font-size: 48px;" text="📊" />
+                            <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;" text="No Data Available" />
+                            <Label style="-fx-font-size: 14px; -fx-text-fill: #95a5a6;" text="Add pollutant data from the Data Viewer to see it here" wrapText="true" textAlignment="CENTER"/>
+                        </VBox>
                     </VBox>
                 </VBox>
             </ScrollPane>

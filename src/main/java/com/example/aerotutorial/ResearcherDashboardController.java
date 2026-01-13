@@ -7,9 +7,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -42,11 +43,9 @@ public class ResearcherDashboardController implements Initializable {
 
 
     @FXML private ScrollPane dataViewPanel, dataHubPanel, researchersPanel, publicationsPanel;
-
-
-    @FXML private TableView<AirQualityData> dataHubTable;
-    @FXML private TableColumn<AirQualityData, String> dateColumn, locationColumn;
-    @FXML private TableColumn<AirQualityData, Double> pm25Column, pm10Column, no2Column, o3Column, so2Column, coColumn;
+    @FXML private VBox dataHubTilesContainer, emptyStateBox, statisticsSection;
+    @FXML private Label totalRecordsLabel;
+    @FXML private PieChart pollutantPieChart;
 
 
     @FXML private VBox researchersListBox, publicationsListBox;
@@ -67,7 +66,7 @@ public class ResearcherDashboardController implements Initializable {
         setupMap();
 
 
-        setupDataHubTable();
+        setupDataHubDisplay();
 
 
         loadSampleResearchers();
@@ -76,7 +75,20 @@ public class ResearcherDashboardController implements Initializable {
         loadSamplePublications();
 
 
+        setupSearchFieldListeners();
+
         showDataView();
+    }
+
+    private void setupSearchFieldListeners() {
+
+        researcherSearchField.setOnAction(e -> searchResearcher());
+
+
+        publicationSearchField.setOnAction(e -> searchPublications());
+
+
+        locationSearchField.setOnAction(e -> searchLocation());
     }
 
     private void loadApiKey() {
@@ -362,6 +374,9 @@ public class ResearcherDashboardController implements Initializable {
 
             saveDataToDatabase(data);
 
+
+            updateDataHubUI();
+
             showAlert("Success", "Data added to Data Hub successfully!");
             System.out.println("✓ Data added to hub: " + selectedLocation);
 
@@ -409,20 +424,209 @@ public class ResearcherDashboardController implements Initializable {
         }
     }
 
-
-    private void setupDataHubTable() {
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
-        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
-        pm25Column.setCellValueFactory(new PropertyValueFactory<>("pm25"));
-        pm10Column.setCellValueFactory(new PropertyValueFactory<>("pm10"));
-        no2Column.setCellValueFactory(new PropertyValueFactory<>("no2"));
-        o3Column.setCellValueFactory(new PropertyValueFactory<>("o3"));
-        so2Column.setCellValueFactory(new PropertyValueFactory<>("so2"));
-        coColumn.setCellValueFactory(new PropertyValueFactory<>("co"));
-
-        dataHubTable.setItems(dataHubList);
-
+    private void setupDataHubDisplay() {
         loadDataFromDatabase();
+        updateDataHubUI();
+    }
+
+
+    private void updateDataHubUI() {
+        dataHubTilesContainer.getChildren().clear();
+
+        if (dataHubList.isEmpty()) {
+            emptyStateBox.setVisible(true);
+            emptyStateBox.setManaged(true);
+            statisticsSection.setVisible(false);
+            statisticsSection.setManaged(false);
+            totalRecordsLabel.setText("Total Records: 0");
+        } else {
+            emptyStateBox.setVisible(false);
+            emptyStateBox.setManaged(false);
+            totalRecordsLabel.setText("Total Records: " + dataHubList.size());
+
+
+            int columns = 3;
+            int row = 0;
+            HBox currentRow = null;
+
+            for (int i = 0; i < dataHubList.size(); i++) {
+                if (i % columns == 0) {
+                    currentRow = new HBox(15);
+                    currentRow.setAlignment(Pos.TOP_LEFT);
+                    dataHubTilesContainer.getChildren().add(currentRow);
+                }
+
+                AirQualityData data = dataHubList.get(i);
+                VBox tile = createDataTile(data, i);
+                HBox.setHgrow(tile, Priority.ALWAYS);
+                currentRow.getChildren().add(tile);
+            }
+        }
+    }
+
+
+    private VBox createDataTile(AirQualityData data, int index) {
+        VBox tile = new VBox(10);
+        tile.setPadding(new Insets(15));
+        tile.setStyle(
+            "-fx-background-color: white; " +
+            "-fx-background-radius: 10; " +
+            "-fx-border-color: #3498db; " +
+            "-fx-border-width: 2; " +
+            "-fx-border-radius: 10; " +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);"
+        );
+        tile.setMaxWidth(Double.MAX_VALUE);
+
+
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label indexBadge = new Label("#" + (index + 1));
+        indexBadge.setStyle(
+            "-fx-font-size: 12px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 4 10; " +
+            "-fx-background-color: #3498db; " +
+            "-fx-text-fill: white; " +
+            "-fx-background-radius: 12;"
+        );
+
+        Label dateLabel = new Label("📅 " + data.getTimestamp());
+        dateLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #7f8c8d;");
+
+        header.getChildren().addAll(indexBadge, dateLabel);
+
+
+        Label locationLabel = new Label("📍 " + data.getLocation());
+        locationLabel.setStyle(
+            "-fx-font-size: 13px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: #2c3e50;"
+        );
+        locationLabel.setWrapText(true);
+
+        Separator separator = new Separator();
+
+
+        GridPane dataGrid = new GridPane();
+        dataGrid.setHgap(10);
+        dataGrid.setVgap(8);
+
+        addPollutantRow(dataGrid, 0, "PM2.5", data.getPm25(), "#e74c3c");
+        addPollutantRow(dataGrid, 1, "PM10", data.getPm10(), "#e67e22");
+        addPollutantRow(dataGrid, 2, "NO₂", data.getNo2(), "#f39c12");
+        addPollutantRow(dataGrid, 3, "O₃", data.getO3(), "#3498db");
+        addPollutantRow(dataGrid, 4, "SO₂", data.getSo2(), "#9b59b6");
+        addPollutantRow(dataGrid, 5, "CO", data.getCo(), "#1abc9c");
+
+
+        HBox buttonBox = new HBox(8);
+        buttonBox.setAlignment(Pos.CENTER);
+
+
+        Button statsBtn = new Button("📊 Stats");
+        statsBtn.setStyle(
+            "-fx-font-size: 11px; " +
+            "-fx-padding: 6 12; " +
+            "-fx-background-color: #9b59b6; " +
+            "-fx-text-fill: white; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand;"
+        );
+        statsBtn.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(statsBtn, Priority.ALWAYS);
+        statsBtn.setOnAction(e -> calculateSingleRecordStatistics(data));
+
+
+        Button deleteBtn = new Button("🗑️ Delete");
+        deleteBtn.setStyle(
+            "-fx-font-size: 11px; " +
+            "-fx-padding: 6 12; " +
+            "-fx-background-color: #e74c3c; " +
+            "-fx-text-fill: white; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand;"
+        );
+        deleteBtn.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(deleteBtn, Priority.ALWAYS);
+        deleteBtn.setOnAction(e -> deleteDataRecord(data));
+
+        buttonBox.getChildren().addAll(statsBtn, deleteBtn);
+
+
+        tile.setOnMouseEntered(e -> {
+            tile.setStyle(
+                "-fx-background-color: #ecf0f1; " +
+                "-fx-background-radius: 10; " +
+                "-fx-border-color: #2980b9; " +
+                "-fx-border-width: 3; " +
+                "-fx-border-radius: 10; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0, 0, 5);"
+            );
+        });
+
+        tile.setOnMouseExited(e -> {
+            tile.setStyle(
+                "-fx-background-color: white; " +
+                "-fx-background-radius: 10; " +
+                "-fx-border-color: #3498db; " +
+                "-fx-border-width: 2; " +
+                "-fx-border-radius: 10; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);"
+            );
+        });
+
+        tile.getChildren().addAll(header, locationLabel, separator, dataGrid, buttonBox);
+        return tile;
+    }
+
+
+    private void addPollutantRow(GridPane grid, int row, String name, double value, String color) {
+        Label nameLabel = new Label(name);
+        nameLabel.setStyle(
+            "-fx-font-size: 12px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: " + color + ";"
+        );
+
+        Label valueLabel = new Label(String.format("%.2f µg/m³", value));
+        valueLabel.setStyle(
+            "-fx-font-size: 12px; " +
+            "-fx-text-fill: #34495e;"
+        );
+
+        grid.add(nameLabel, 0, row);
+        grid.add(valueLabel, 1, row);
+    }
+
+
+    private void deleteDataRecord(AirQualityData data) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Record");
+        confirm.setHeaderText("Delete this data record?");
+        confirm.setContentText("This action cannot be undone.");
+
+        if (confirm.showAndWait().get() == ButtonType.OK) {
+            dataHubList.remove(data);
+            deleteFromDatabase(data);
+            updateDataHubUI();
+            System.out.println("✓ Record deleted");
+        }
+    }
+
+
+    private void deleteFromDatabase(AirQualityData data) {
+        try (var conn = DBConnector.getInstance().getConnection();
+             var stmt = conn.prepareStatement(
+                 "DELETE FROM research_data WHERE timestamp=? AND location=?"
+             )) {
+            stmt.setString(1, data.getTimestamp());
+            stmt.setString(2, data.getLocation());
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to delete from database: " + e.getMessage());
+        }
     }
 
 
@@ -453,38 +657,113 @@ public class ResearcherDashboardController implements Initializable {
     }
 
 
-    @FXML
-    private void calculateStatistics() {
-        if (dataHubList.isEmpty()) {
-            showAlert("No Data", "Data Hub is empty. Add some data first.");
-            return;
-        }
 
-        double avgPm25 = dataHubList.stream().mapToDouble(AirQualityData::getPm25).average().orElse(0);
-        double avgPm10 = dataHubList.stream().mapToDouble(AirQualityData::getPm10).average().orElse(0);
-        double avgNo2 = dataHubList.stream().mapToDouble(AirQualityData::getNo2).average().orElse(0);
-        double avgO3 = dataHubList.stream().mapToDouble(AirQualityData::getO3).average().orElse(0);
-        double avgSo2 = dataHubList.stream().mapToDouble(AirQualityData::getSo2).average().orElse(0);
-        double avgCo = dataHubList.stream().mapToDouble(AirQualityData::getCo).average().orElse(0);
+    private void calculateSingleRecordStatistics(AirQualityData data) {
+        double pm25 = data.getPm25();
+        double pm10 = data.getPm10();
+        double no2 = data.getNo2();
+        double o3 = data.getO3();
+        double so2 = data.getSo2();
+        double co = data.getCo();
 
-        double maxPm25 = dataHubList.stream().mapToDouble(AirQualityData::getPm25).max().orElse(0);
-        double minPm25 = dataHubList.stream().mapToDouble(AirQualityData::getPm25).min().orElse(0);
+
+        double total = pm25 + pm10 + no2 + o3 + so2 + co;
 
         String stats = String.format(
-                "📊 Statistical Analysis (n=%d samples)\n\n" +
-                "Average Values:\n" +
-                "  PM2.5: %.2f µg/m³\n" +
-                "  PM10: %.2f µg/m³\n" +
-                "  NO₂: %.2f µg/m³\n" +
-                "  O₃: %.2f µg/m³\n" +
-                "  SO₂: %.2f µg/m³\n" +
-                "  CO: %.2f µg/m³\n\n" +
-                "PM2.5 Range: %.2f - %.2f µg/m³",
-                dataHubList.size(), avgPm25, avgPm10, avgNo2, avgO3, avgSo2, avgCo, minPm25, maxPm25
+                "📊 Individual Record Analysis\n\n" +
+                "📍 Location: %s\n" +
+                "📅 Timestamp: %s\n\n" +
+                "Pollutant Concentrations:\n\n" +
+                "🔴 PM2.5:  %.2f µg/m³  (%.1f%%)\n" +
+                "🟠 PM10:   %.2f µg/m³  (%.1f%%)\n" +
+                "🟡 NO₂:    %.2f µg/m³  (%.1f%%)\n" +
+                "🔵 O₃:     %.2f µg/m³  (%.1f%%)\n" +
+                "🟣 SO₂:    %.2f µg/m³  (%.1f%%)\n" +
+                "🟢 CO:     %.2f µg/m³  (%.1f%%)\n\n" +
+                "Total Concentration: %.2f µg/m³\n\n" +
+                "💡 The pie chart shows the distribution\nof pollutants for this specific record.",
+                data.getLocation(), data.getTimestamp(),
+                pm25, (pm25/total)*100,
+                pm10, (pm10/total)*100,
+                no2, (no2/total)*100,
+                o3, (o3/total)*100,
+                so2, (so2/total)*100,
+                co, (co/total)*100,
+                total
         );
 
         statsLabel.setText(stats);
-        System.out.println("✓ Statistics calculated");
+
+
+        statisticsSection.setVisible(true);
+        statisticsSection.setManaged(true);
+
+
+        updatePieChart(pm25, pm10, no2, o3, so2, co);
+
+        System.out.println("✓ Statistics calculated for record: " + data.getLocation() + " at " + data.getTimestamp());
+    }
+
+
+
+
+    private void updatePieChart(double pm25, double pm10, double no2, double o3, double so2, double co) {
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
+            new PieChart.Data("PM2.5", pm25),
+            new PieChart.Data("PM10", pm10),
+            new PieChart.Data("NO₂", no2),
+            new PieChart.Data("O₃", o3),
+            new PieChart.Data("SO₂", so2),
+            new PieChart.Data("CO", co)
+        );
+
+        pollutantPieChart.setData(pieChartData);
+        pollutantPieChart.setTitle("Average Pollutant Distribution");
+
+
+        double total = pm25 + pm10 + no2 + o3 + so2 + co;
+
+        for (int i = 0; i < pieChartData.size(); i++) {
+            PieChart.Data data = pieChartData.get(i);
+            double percentage = (data.getPieValue() / total) * 100;
+
+            data.setName(String.format("%s (%.1f%%)", data.getName(), percentage));
+        }
+
+
+        applyPieChartColors();
+    }
+
+
+    private void applyPieChartColors() {
+        Platform.runLater(() -> {
+            String[] colors = {"#e74c3c", "#e67e22", "#f39c12", "#3498db", "#9b59b6", "#1abc9c"};
+
+            ObservableList<PieChart.Data> data = pollutantPieChart.getData();
+            for (int i = 0; i < data.size() && i < colors.length; i++) {
+                final int index = i;
+                final PieChart.Data slice = data.get(i);
+
+
+                if (slice.getNode() != null) {
+                    slice.getNode().setStyle("-fx-pie-color: " + colors[index] + ";");
+                } else {
+
+                    Platform.runLater(() -> {
+                        if (slice.getNode() != null) {
+                            slice.getNode().setStyle("-fx-pie-color: " + colors[index] + ";");
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+    @FXML
+    private void refreshDataHub() {
+        updateDataHubUI();
+        showAlert("Refreshed", "Data Hub display has been refreshed.");
     }
 
 
@@ -499,6 +778,11 @@ public class ResearcherDashboardController implements Initializable {
             dataHubList.clear();
             statsLabel.setText("");
 
+            statisticsSection.setVisible(false);
+            statisticsSection.setManaged(false);
+
+
+            updateDataHubUI();
 
             try (var conn = DBConnector.getInstance().getConnection();
                  var stmt = conn.createStatement()) {
