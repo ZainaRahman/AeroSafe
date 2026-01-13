@@ -39,52 +39,37 @@
                         <TabPane>
                             <Tab text="Regular Users" closable="false">
                                 <VBox spacing="10" style="-fx-padding: 10;">
-                                    <HBox spacing="10" alignment="CENTER_LEFT">
-                                        <Label text="Total Users:" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="totalUsersLabel" text="0" style="-fx-text-fill: #e74c3c;"/>
+                                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
+                                        <Label text="Total Users:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                        <Label fx:id="totalUsersLabel" text="0" style="-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="🔄 Refresh Users" onAction="#refreshUsers" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15; -fx-cursor: hand;"/>
                                     </HBox>
-                                    <TableView fx:id="usersTable" prefHeight="300">
-                                        <columns>
-                                            <TableColumn fx:id="userIdCol" text="ID" prefWidth="50" />
-                                            <TableColumn fx:id="userNameCol" text="Username" prefWidth="150" />
-                                            <TableColumn fx:id="userLocationCol" text="Location" prefWidth="200" />
-                                        </columns>
-                                    </TableView>
-                                    <Button text="🔄 Refresh Users" onAction="#refreshUsers" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;"/>
+                                    <VBox fx:id="usersTileContainer" spacing="20" style="-fx-padding: 10 0;"/>
                                 </VBox>
                             </Tab>
 
                             <Tab text="Researchers" closable="false">
                                 <VBox spacing="10" style="-fx-padding: 10;">
-                                    <HBox spacing="10" alignment="CENTER_LEFT">
-                                        <Label text="Total Researchers:" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="totalResearchersLabel" text="0" style="-fx-text-fill: #9b59b6;"/>
+                                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
+                                        <Label text="Total Researchers:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                        <Label fx:id="totalResearchersLabel" text="0" style="-fx-text-fill: #9b59b6; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="🔄 Refresh Researchers" onAction="#refreshResearchers" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-padding: 8 15; -fx-cursor: hand;"/>
                                     </HBox>
-                                    <TableView fx:id="researchersTable" prefHeight="300">
-                                        <columns>
-                                            <TableColumn fx:id="researcherIdCol" text="ID" prefWidth="50" />
-                                            <TableColumn fx:id="researcherNameCol" text="Username" prefWidth="150" />
-                                            <TableColumn fx:id="researcherLocationCol" text="Location" prefWidth="200" />
-                                        </columns>
-                                    </TableView>
-                                    <Button text="🔄 Refresh Researchers" onAction="#refreshResearchers" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-padding: 8 15;"/>
+                                    <VBox fx:id="researchersTileContainer" spacing="20" style="-fx-padding: 10 0;"/>
                                 </VBox>
                             </Tab>
 
                             <Tab text="Admins" closable="false">
                                 <VBox spacing="10" style="-fx-padding: 10;">
-                                    <HBox spacing="10" alignment="CENTER_LEFT">
-                                        <Label text="Total Admins:" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="totalAdminsLabel" text="0" style="-fx-text-fill: #c0392b;"/>
+                                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
+                                        <Label text="Total Admins:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                        <Label fx:id="totalAdminsLabel" text="0" style="-fx-text-fill: #c0392b; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="🔄 Refresh Admins" onAction="#refreshAdmins" style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-padding: 8 15; -fx-cursor: hand;"/>
                                     </HBox>
-                                    <TableView fx:id="adminsTable" prefHeight="300">
-                                        <columns>
-                                            <TableColumn fx:id="adminIdCol" text="ID" prefWidth="50" />
-                                            <TableColumn fx:id="adminNameCol" text="Username" prefWidth="150" />
-                                            <TableColumn fx:id="adminLocationCol" text="Location" prefWidth="200" />
-                                        </columns>
-                                    </TableView>
-                                    <Button text="🔄 Refresh Admins" onAction="#refreshAdmins" style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-padding: 8 15;"/>
+                                    <VBox fx:id="adminsTileContainer" spacing="20" style="-fx-padding: 10 0;"/>
                                 </VBox>
                             </Tab>
                         </TabPane>
@@ -100,30 +85,17 @@
                         <Label style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;" text="Environmental issue reports submitted by users" />
                         <Separator />
 
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <Label text="Total Reports:" style="-fx-font-weight: bold;"/>
-                            <Label fx:id="totalReportsLabel" text="0" style="-fx-text-fill: #f39c12; -fx-font-weight: bold;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
+                            <Label text="Total Reports:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                            <Label fx:id="totalReportsLabel" text="0" style="-fx-text-fill: #f39c12; -fx-font-weight: bold; -fx-font-size: 14px;"/>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <ComboBox fx:id="reportStatusFilter" promptText="Filter by Status" onAction="#filterReports"/>
+                            <Label text="Filter by Status:" style="-fx-font-weight: bold;"/>
+                            <ComboBox fx:id="reportStatusFilter" promptText="All" onAction="#filterReports" prefWidth="150"/>
+                            <Button text="🔄 Refresh" onAction="#refreshReports" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 8 15; -fx-cursor: hand;"/>
                         </HBox>
 
-                        <TableView fx:id="reportsTable" prefHeight="400">
-                            <columns>
-                                <TableColumn fx:id="reportIdCol" text="ID" prefWidth="50" />
-                                <TableColumn fx:id="reportDateCol" text="Date" prefWidth="130" />
-                                <TableColumn fx:id="reporterNameCol" text="Reporter" prefWidth="100" />
-                                <TableColumn fx:id="reportLocationCol" text="Location" prefWidth="150" />
-                                <TableColumn fx:id="reportIssueCol" text="Issue Type" prefWidth="150" />
-                                <TableColumn fx:id="reportSeverityCol" text="Severity" prefWidth="100" />
-                                <TableColumn fx:id="reportStatusCol" text="Status" prefWidth="100" />
-                            </columns>
-                        </TableView>
-
-                        <HBox spacing="10">
-                            <Button text="📄 View Details" onAction="#viewReportDetails" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;"/>
-                            <Button text="✅ Mark as Resolved" onAction="#markReportResolved" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 8 15;"/>
-                            <Button text="🔄 Refresh Reports" onAction="#refreshReports" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 8 15;"/>
-                        </HBox>
+                        <!-- Tile Grid Container -->
+                        <VBox fx:id="reportsTileContainer" spacing="20" style="-fx-padding: 10 0;"/>
                     </VBox>
                 </VBox>
             </ScrollPane>
@@ -148,10 +120,18 @@
                                 <ComboBox fx:id="alertSeverityCombo" prefWidth="200"/>
                             </HBox>
 
-                            <HBox spacing="10" alignment="CENTER_LEFT">
-                                <Label text="Location:" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="alertLocationField" promptText="e.g., Dhaka, Bangladesh" prefWidth="300"/>
-                            </HBox>
+                            <VBox spacing="5">
+                                <Label text="Location (Search or Click on map):" style="-fx-font-weight: bold;"/>
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <TextField fx:id="alertLocationSearchField" promptText="Search location (e.g., Dhaka, Bangladesh)" prefWidth="450"/>
+                                    <Button text="🔍 Search" onAction="#searchAlertLocation" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15; -fx-cursor: hand;"/>
+                                </HBox>
+                                <javafx.scene.web.WebView fx:id="alertMapView" prefHeight="300" prefWidth="600" style="-fx-border-color: #bdc3c7; -fx-border-width: 2; -fx-border-radius: 5;"/>
+                                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0 0 0;">
+                                    <Label text="Selected Location:" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                    <Label fx:id="selectedAlertLocationLabel" text="None selected" style="-fx-font-size: 12px; -fx-text-fill: #e67e22;"/>
+                                </HBox>
+                            </VBox>
 
                             <VBox spacing="5">
                                 <Label text="Alert Message:" style="-fx-font-weight: bold;"/>
