@@ -19,25 +19,26 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-    // Initialize map
+
     var map = L.map('map').setView([23.8103, 90.4125], 12); // Dhaka by default
 
-    // Tile layer
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Wait for Java bridge to be ready
+
     var javaAppReady = false;
     var checkInterval = setInterval(function() {
-        if (window.app && typeof window.app.onMapClick === 'function') {
+        if ((window.app && typeof window.app.onMapClick === 'function') ||
+            (window.adminApp && typeof window.adminApp.onAlertMapClick === 'function')) {
             javaAppReady = true;
             console.log("✓ Java bridge connected successfully!");
             clearInterval(checkInterval);
         }
     }, 100);
 
-    // Stop checking after 10 seconds
+
     setTimeout(function() {
         clearInterval(checkInterval);
         if (!javaAppReady) {
@@ -45,17 +46,29 @@
         }
     }, 10000);
 
-    // Click event with retry mechanism
+
     map.on('click', function(e) {
         var lat = e.latlng.lat;
         var lon = e.latlng.lng;
         var cityName = "Selected Location";
 
-        // Try to call Java method with retries
+
         var maxRetries = 3;
         var retryCount = 0;
 
         function tryCallJava() {
+
+            if (window.adminApp && typeof window.adminApp.onAlertMapClick === 'function') {
+                try {
+                    window.adminApp.onAlertMapClick(cityName, lat, lon);
+                    console.log("✓ Alert location selected: " + lat + ", " + lon);
+                    return true;
+                } catch (err) {
+                    console.error("Error calling admin Java method: " + err);
+                }
+            }
+
+
             if (window.app && typeof window.app.onMapClick === 'function') {
                 try {
                     window.app.onMapClick(cityName, lat, lon);
@@ -65,7 +78,9 @@
                     console.error("Error calling Java method: " + err);
                     return false;
                 }
-            } else if (retryCount < maxRetries) {
+            }
+
+            if (retryCount < maxRetries) {
                 retryCount++;
                 console.log("Retry " + retryCount + ": Java app not ready, waiting...");
                 setTimeout(tryCallJava, 200);
