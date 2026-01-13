@@ -57,14 +57,14 @@ public class EmailService {
         verificationCodes.put(toEmail, new VerificationData(verificationCode, System.currentTimeMillis()));
 
         System.out.println("📧 Sending verification email to: " + toEmail);
-        System.out.println("🔑 Verification code: " + verificationCode + " (expires in 10 minutes)");
+        System.out.println("🔑 Verification code: " + verificationCode + " (expires in 30 seconds)");
         if (mockMode) {
             System.out.println("========================================");
             System.out.println("🎭 MOCK MODE - EMAIL NOT SENT");
             System.out.println("📧 To: " + toEmail);
             System.out.println("👤 User: " + userName);
             System.out.println("🔑 VERIFICATION CODE: " + verificationCode);
-            System.out.println("⏱️  Expires in 10 minutes");
+            System.out.println("⏱️  Expires in 30 seconds");
             System.out.println("========================================");
             scheduleCodeExpiration(toEmail);
             return true;
@@ -95,7 +95,7 @@ public class EmailService {
                 "<div style='background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); color: white; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; border-radius: 8px; margin: 20px 0;'>" +
                 "%s" +
                 "</div>" +
-                "<p style='color: #999; font-size: 14px; text-align: center;'>⏱️ This code will expire in 10 minutes</p>" +
+                "<p style='color: #999; font-size: 14px; text-align: center;'>⏱️ This code will expire in 30 seconds</p>" +
                 "<hr style='border: none; border-top: 1px solid #eee; margin: 30px 0;'>" +
                 "<p style='color: #999; font-size: 12px; line-height: 1.6;'>If you didn't request this verification, please ignore this email. Your account will not be created without email verification.</p>" +
                 "</div>" +
@@ -129,7 +129,7 @@ public class EmailService {
         verificationCodes.put(toEmail, new VerificationData(resetCode, System.currentTimeMillis()));
 
         System.out.println("📧 Sending password reset email to: " + toEmail);
-        System.out.println("🔑 Reset code: " + resetCode + " (expires in 10 minutes)");
+        System.out.println("🔑 Reset code: " + resetCode + " (expires in 30 seconds)");
 
 
         try {
@@ -155,7 +155,7 @@ public class EmailService {
                 "<div style='background: linear-gradient(135deg, #f093fb 0%%, #f5576c 100%%); color: white; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; border-radius: 8px; margin: 20px 0;'>" +
                 "%s" +
                 "</div>" +
-                "<p style='color: #999; font-size: 14px; text-align: center;'>⏱️ This code will expire in 10 minutes</p>" +
+                "<p style='color: #999; font-size: 14px; text-align: center;'>⏱️ This code will expire in 30 seconds</p>" +
                 "<hr style='border: none; border-top: 1px solid #eee; margin: 30px 0;'>" +
                 "<p style='color: #999; font-size: 12px; line-height: 1.6;'><strong>⚠️ Security Note:</strong> If you didn't request this password reset, please ignore this email and ensure your account is secure.</p>" +
                 "</div>" +
@@ -193,9 +193,9 @@ public class EmailService {
 
 
         long currentTime = System.currentTimeMillis();
-        long elapsedMinutes = (currentTime - data.timestamp) / (60 * 1000);
+        long elapsedSeconds = (currentTime - data.timestamp) / 1000;
 
-        if (elapsedMinutes > 10) {
+        if (elapsedSeconds > 30) {
             System.out.println("⏱️ Verification code expired for: " + email);
             verificationCodes.remove(email);
             return false;
@@ -239,7 +239,7 @@ public class EmailService {
                 verificationCodes.remove(email);
                 System.out.println("🗑️ Expired verification code removed for: " + email);
             }
-        }, 10 * 60 * 1000);
+        }, 30 * 1000);
     }
 
 
