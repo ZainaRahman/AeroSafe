@@ -65,6 +65,17 @@
                         <TextField fx:id="contactField" promptText="Enter your contact information for follow-up" style="-fx-font-size: 13px; -fx-padding: 10;"/>
                     </VBox>
 
+                    <!-- Image Upload -->
+                    <VBox spacing="5">
+                        <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Upload Evidence Photo (Optional):" />
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Button fx:id="uploadImageButton" onAction="#uploadImage" prefWidth="200"
+                                    style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"
+                                    text="📷 Choose Image" />
+                            <Label fx:id="imageStatusLabel" style="-fx-font-size: 13px; -fx-text-fill: #27ae60;" wrapText="true"/>
+                        </HBox>
+                    </VBox>
+
                     <!-- Action Buttons -->
                     <HBox spacing="15" alignment="CENTER" style="-fx-padding: 20 0 0 0;">
                         <Button onAction="#submitReport" prefWidth="200"
@@ -86,6 +97,7 @@
                         <Label style="-fx-font-size: 13px; -fx-text-fill: #856404;" text="• Be specific about the location and time of the issue" wrapText="true"/>
                         <Label style="-fx-font-size: 13px; -fx-text-fill: #856404;" text="• Provide as much detail as possible in the description" wrapText="true"/>
                         <Label style="-fx-font-size: 13px; -fx-text-fill: #856404;" text="• Include current AQI measurements if available" wrapText="true"/>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #856404;" text="• Upload photos of pollution sources or environmental concerns (JPG, PNG)" wrapText="true"/>
                         <Label style="-fx-font-size: 13px; -fx-text-fill: #856404;" text="• Your report will be reviewed by government officials" wrapText="true"/>
                         <Label style="-fx-font-size: 13px; -fx-text-fill: #856404;" text="• Emergency situations should be reported to local authorities immediately" wrapText="true"/>
                     </VBox>
